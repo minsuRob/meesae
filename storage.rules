@@ -1,0 +1,58 @@
+rules_version = '2';
+
+// 본인 경로만 쓰기. 사진만, 5MB 이하. 업로드 후 onImageUploaded 가 EXIF 를 지우고 다시 저장한다.
+// 덮어쓰기·삭제도 본인만 (Functions 는 Admin 이라 Rules 를 지나지 않는다).
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+    function notBanned() {
+      return request.auth.token.get('banned', false) != true;
+    }
+    function active() {
+      return signedIn() && notBanned() && request.auth.token.get('onboarded', false) == true;
+    }
+    function isImageUpload() {
+      return request.resource != null
+        && request.resource.contentType.matches('image/.*')
+        && request.resource.size > 0
+        && request.resource.size <= 5 * 1024 * 1024;
+    }
+    function owner(uid) {
+      return signedIn() && notBanned() && request.auth.uid == uid;
+    }
+
+    // 프로필 사진. 온보딩 중(아직 onboarded 아님)에도 본인은 올리고 볼 수 있다.
+    match /users/{uid}/profile/{file} {
+      allow read: if owner(uid) || active();
+      allow create, update: if owner(uid) && isImageUpload();
+      allow delete: if owner(uid);
+    }
+
+    match /posts/{uid}/{file} {
+      allow read: if active();
+      allow create, update: if owner(uid) && active() && isImageUpload();
+      allow delete: if owner(uid);
+    }
+
+    // 채팅 사진. 휴대폰 인증 + 대화방 멤버만 올린다. 읽기는 멤버만.
+    match /chat/{convId}/{uid}/{file} {
+      function members() {
+        return firestore.get(/databases/(default)/documents/conversations/$(convId)).data.members;
+      }
+      allow read: if active() && request.auth.uid in members();
+      allow create: if owner(uid) && active()
+        && request.auth.token.get('phoneVerified', false) == true
+        && request.auth.uid in members()
+        && isImageUpload();
+      allow update, delete: if false;
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

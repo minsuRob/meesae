@@ -1,0 +1,144 @@
+rules_version = '2';
+
+// 기본 deny. 민감한 쓰기는 전부 Functions(Admin SDK) 가 한다. Admin 은 Rules 를 지나지 않는다.
+// 권한 조건은 shared/permissions.ts 와 같은 뜻이어야 한다. 한쪽을 바꾸면 다른 쪽도 본다.
+//
+// 클라이언트가 직접 쓸 수 있는 곳은 딱 하나: users_private/{uid} 의 filters·fcmTokens·settings.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+    function isMe(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+    function notBanned() {
+      return request.auth.token.get('banned', false) != true;
+    }
+    // 온보딩을 마치고 정지되지 않은 사용자
+    function active() {
+      return signedIn() && notBanned() && request.auth.token.get('onboarded', false) == true;
+    }
+    function isAdmin() {
+      return signedIn() && request.auth.token.get('role', '') == 'admin';
+    }
+    function isMember(members) {
+      return signedIn() && request.auth.uid in members;
+    }
+    // owner 가 나를 차단했는가
+    function blockedBy(owner) {
+      return exists(/databases/$(database)/documents/blocks/$(owner)/targets/$(request.auth.uid));
+    }
+
+    // ── 사용자 ─────────────────────────────────────────────────────────
+
+    // 공개 프로필: 단건 조회만. 목록 조회(스크래핑)는 막고 추천은 Functions 가 만든다.
+    match /users_public/{uid} {
+      allow get: if isMe(uid)
+        || (active() && resource.data.visible == true && !blockedBy(uid));
+      allow list, write: if false;
+    }
+
+    match /users_private/{uid} {
+      allow get: if isMe(uid) && notBanned();
+      allow list, create, delete: if false;
+      allow update: if isMe(uid) && notBanned()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['filters', 'fcmTokens', 'settings'])
+        && (!('filters' in request.resource.data) || request.resource.data.filters is map)
+        && (!('fcmTokens' in request.resource.data)
+            || (request.resource.data.fcmTokens is list && request.resource.data.fcmTokens.size() <= 10))
+        && (!('settings' in request.resource.data) || request.resource.data.settings is map);
+    }
+
+    match /users_internal/{uid} {
+      allow read, write: if false;
+    }
+
+    // ── 포인트 ─────────────────────────────────────────────────────────
+
+    match /wallets/{uid} {
+      allow get: if isMe(uid);
+      allow list, write: if false;
+
+      match /ledger/{entryId} {
+        allow read: if isMe(uid);
+        allow write: if false;
+      }
+      match /requests/{requestId} {
+        allow read, write: if false;
+      }
+    }
+
+    // ── 관계 ───────────────────────────────────────────────────────────
+
+    match /likes/{likeId} {
+      allow read, write: if false;
+    }
+
+    match /matches/{matchId} {
+      allow read: if active() && isMember(resource.data.members);
+      allow write: if false;
+    }
+
+    // 목록 조회는 where('members', 'array-contains', 내 uid) 를 반드시 걸어야 통과한다
+    match /conversations/{convId} {
+      allow read: if active() && isMember(resource.data.members);
+      allow write: if false;
+
+      match /messages/{messageId} {
+        allow read: if active()
+          && isMember(get(/databases/$(database)/documents/conversations/$(convId)).data.members);
+        allow write: if false;
+      }
+    }
+
+    match /blocks/{owner}/targets/{target} {
+      allow read: if isMe(owner);
+      allow write: if false;
+    }
+
+    match /reports/{reportId} {
+      allow read, write: if false;
+    }
+
+    // 만료되면 참여자도 못 읽는다. 목록 조회는 where('expiresAt', '>', now) 를 걸어야 통과한다.
+    match /location_shares/{shareId} {
+      allow read: if active()
+        && isMember(resource.data.members)
+        && resource.data.expiresAt > request.time.toMillis();
+      allow write: if false;
+    }
+
+    // ── 피드 ───────────────────────────────────────────────────────────
+
+    // 목록 조회는 where('status', '==', 'visible') 를 걸어야 통과한다
+    match /posts/{postId} {
+      allow read: if active() && (resource.data.status == 'visible' || resource.data.authorUid == request.auth.uid);
+      allow write: if false;
+
+      match /comments/{commentId} {
+        allow read: if active();
+        allow write: if false;
+      }
+      // 내가 좋아요 했는지만 볼 수 있다
+      match /likes/{uid} {
+        allow get: if active() && isMe(uid);
+        allow list, write: if false;
+      }
+    }
+
+    // ── 운영 ───────────────────────────────────────────────────────────
+
+    match /config/economy {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+
+    // region_stats · phone_index · rate_limits · geocode_cache 와 나머지 전부
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
