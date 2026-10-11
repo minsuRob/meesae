@@ -42,7 +42,7 @@
 | `b8c0cd5` | 작업 기록 `worklog/` 를 인덱스 방식으로 정리 + 링크 검사기 |
 | `8dc7c0e` | Claude 문서 자동 읽기: 루트 CLAUDE.md 길잡이, 폴더별 CLAUDE.md 4개, 문서 링크 검사 훅 |
 | `9c60661` · `c2c1ef8` | 웹 Hosting 첫 배포 (https://meesae-app.web.app), `deploy:web` 이 에뮬레이터 모드를 끄고 빌드 |
-| 다음 커밋 | iOS 첫 시뮬레이터 빌드: RNFirebase SPM 끄기(`app.json` 의 `ios.disableSPM`) — `useFrameworks: static` 과 충돌 |
+| `4b816b6` | iOS 첫 시뮬레이터 빌드: RNFirebase SPM 끄기(`app.json` 의 `ios.disableSPM`) — `useFrameworks: static` 과 충돌 |
 | `658bf94` | Android 첫 네이티브 빌드(APK)·에뮬레이터 전 흐름 검증, 그때 나온 버그 4개 수정 (`react-native-keyboard-controller` 추가) |
 
 ## 테스트 중 고친 버그
