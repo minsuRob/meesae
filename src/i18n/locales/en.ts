@@ -129,6 +129,8 @@ export const en: Catalog = {
     phoneInvalid: 'Please check your phone number',
     googleNoToken: "We couldn't sign you in with Google. Please try again",
     appleNoToken: "We couldn't sign you in with Apple",
+    popupBlocked: 'The sign-in window was blocked. Allow pop-ups for this site and try again',
+    providerDisabled: "This sign-in method isn't available yet. Please try another one",
   },
 
   options: {

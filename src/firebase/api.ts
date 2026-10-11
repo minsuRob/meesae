@@ -61,6 +61,8 @@ function firebaseMessage(e: FirebaseError): string {
   if (c === 'auth/invalid-phone-number' || c === 'auth/missing-phone-number') return translate('errors.phoneInvalid');
   if (c === 'auth/credential-already-in-use' || c === 'auth/provider-already-linked') return translate('errors.PHONE_IN_USE');
   if (c === 'auth/network-request-failed') return translate('errors.network');
+  if (c === 'auth/popup-blocked') return translate('errors.popupBlocked');
+  if (c === 'auth/operation-not-allowed') return translate('errors.providerDisabled');
   if (c.endsWith('unauthenticated')) return translate('errors.signInAgain');
   if (c.endsWith('unavailable') || c.endsWith('deadline-exceeded')) return translate('errors.network');
   if (c.endsWith('resource-exhausted')) return translate('errors.RATE_LIMITED');

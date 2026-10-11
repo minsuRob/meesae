@@ -57,3 +57,6 @@ public/maplibre/
 # Functions 파라미터 파일은 비밀값이 없어 커밋한다 (비밀값은 Secret Manager · functions/.secret.local)
 !functions/.env
 !functions/.env.local
+
+# 실기기·실서버 테스트 캡처 (개인정보가 찍힐 수 있어 커밋하지 않는다)
+qa/

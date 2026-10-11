@@ -130,6 +130,8 @@ export const ko = {
     phoneInvalid: '전화번호를 다시 확인해 주세요',
     googleNoToken: '구글 로그인 정보를 받지 못했어요. 잠시 후 다시 시도해 주세요',
     appleNoToken: 'Apple 로그인 정보를 받지 못했어요',
+    popupBlocked: '로그인 창이 차단됐어요. 브라우저에서 이 사이트의 팝업을 허용한 뒤 다시 눌러 주세요',
+    providerDisabled: '아직 준비 중인 로그인 방법이에요. 다른 방법으로 로그인해 주세요',
   },
 
   options: {
