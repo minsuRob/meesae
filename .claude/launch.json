@@ -4,8 +4,29 @@
     {
       "name": "web",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["expo", "start", "--web", "--port", "8097"],
+      "runtimeArgs": [
+        "expo",
+        "start",
+        "--web",
+        "--port",
+        "8097"
+      ],
       "port": 8097
+    },
+    {
+      "name": "web-prod",
+      "runtimeExecutable": "env",
+      "runtimeArgs": [
+        "EXPO_PUBLIC_USE_EMULATOR=0",
+        "npx",
+        "expo",
+        "start",
+        "--web",
+        "--port",
+        "8098",
+        "--clear"
+      ],
+      "port": 8098
     }
   ]
 }
