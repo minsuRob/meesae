@@ -3,7 +3,7 @@
 meesae 작업 기록. **전부 읽지 말고, 아래 표에서 지금 필요한 칸만 따라간다.**
 각 파일은 맨 위에 목차가 있고, 한 파일에 한 주제만 있다.
 
-마지막 갱신: 2026-10-11 · 커밋 `683161f` 기준 · 원본 규칙은 루트 `AGENTS.md`
+마지막 갱신: 2026-10-11 · 커밋 `8dc7c0e` 이후 (웹 Hosting 배포) · 원본 규칙은 루트 `AGENTS.md`
 
 ## 이럴 땐 여기
 
@@ -52,7 +52,7 @@ meesae 작업 기록. **전부 읽지 말고, 아래 표에서 지금 필요한 
 ## 상태 요약
 
 - 코드: 웹·iOS·Android 한 코드베이스, 기능 전부 구현, 한국어·영어, 라이트·다크(지도는 meesae 다크). `main` 에 푸시됨
-- 서버: `meesae-app`(Blaze) — Firestore·Storage(서울), Rules·인덱스, Functions 29개. `beforeSignIn` 보류
+- 서버: `meesae-app`(Blaze) — Firestore·Storage(서울), Rules·인덱스, Functions 29개, 웹 https://meesae-app.web.app. `beforeSignIn` 보류
 - 로그인: Google 만 켜짐. Apple·휴대폰 미설정
 - 테스트: 단위 41 · Rules 22 · Functions 통합 16 · 실서버 스모크 18 전부 통과, 본인 구글 계정으로 실서버 웹 흐름 확인
 - 아직: 네이티브 빌드 0회, **App Check 강제 꺼짐** → [07 › P0](07-todo.md#p0-출시-차단)

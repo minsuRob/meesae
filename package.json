@@ -15,7 +15,7 @@
     "test:functions": "node scripts/ensure-dev-secrets.mjs && npm --prefix functions run build && firebase emulators:exec --only auth,firestore,functions,storage --project demo-meesae-test \"vitest run --config vitest.functions.config.mts\"",
     "typecheck": "tsc --noEmit && npm --prefix functions run typecheck",
     "emulators": "node scripts/ensure-dev-secrets.mjs && npm --prefix functions run build && firebase emulators:start --project demo-meesae",
-    "deploy:web": "expo export --platform web && firebase deploy --only hosting",
+    "deploy:web": "EXPO_PUBLIC_USE_EMULATOR=0 expo export --platform web && firebase deploy --only hosting",
     "deploy:backend": "npm --prefix functions run build && firebase deploy --only functions,firestore,storage",
     "emulators:persist": "node scripts/ensure-dev-secrets.mjs && npm --prefix functions run build && firebase emulators:start --project demo-meesae --import .emulator-data --export-on-exit .emulator-data",
     "seed": "node scripts/seed-emulator.mjs",

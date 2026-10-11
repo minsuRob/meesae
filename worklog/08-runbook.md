@@ -37,8 +37,11 @@ EXPO_PUBLIC_USE_EMULATOR=0 npx expo start --web --port 8098 --clear
 
 ```bash
 npm run deploy:backend    # Functions 빌드 + Functions·Firestore·Storage
-npm run deploy:web        # expo export → Hosting (아직 안 함)
+npm run deploy:web        # expo export → Hosting (https://meesae-app.web.app)
 ```
+
+`.env` 는 에뮬레이터 모드(`EXPO_PUBLIC_USE_EMULATOR=1`)라서 `deploy:web` 이 `=0` 으로 덮어쓰고 빌드한다.
+직접 `expo export` 할 때도 같은 값을 붙인다. 안 붙이면 웹이 demo 에뮬레이터에 붙는다.
 
 `beforeSignIn` 은 Identity Platform 전까지 빼고 배포한다 (`--only functions:이름,...`).
 

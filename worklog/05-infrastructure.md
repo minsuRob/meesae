@@ -33,7 +33,7 @@
 | Firestore Rules · 인덱스 · Storage Rules | 배포됨 |
 | Functions | **29개 배포됨** (callable 26 + onAuthCreate · onImageUploaded · cleanupExpiredShares) |
 | `beforeSignIn` | **미배포** — Identity Platform 업그레이드 필요 (보류 결정) |
-| 웹 호스팅 | 미배포 (`npm run deploy:web`) |
+| 웹 호스팅 | 배포됨 — https://meesae-app.web.app (2026-10-11, `npm run deploy:web`) |
 
 > 첫 배포에 실패했던 함수 12개에는 Cloud Run 공개 호출 권한을 손으로 붙였다.
 > 새 함수가 401 이면 → [08-runbook.md#callable-이-401](08-runbook.md#callable-이-401)

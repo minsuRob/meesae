@@ -40,7 +40,8 @@
 | `7cdb95f` | 탈퇴한 상대를 '탈퇴한 사용자' 로 표시 |
 | `683161f` | 다크 지도를 meesae 다크(OpenFreeMap dark 색 조정)로 |
 | `b8c0cd5` | 작업 기록 `worklog/` 를 인덱스 방식으로 정리 + 링크 검사기 |
-| 다음 커밋 | Claude 문서 자동 읽기: 루트 CLAUDE.md 길잡이, 폴더별 CLAUDE.md 4개, 문서 링크 검사 훅 |
+| `8dc7c0e` | Claude 문서 자동 읽기: 루트 CLAUDE.md 길잡이, 폴더별 CLAUDE.md 4개, 문서 링크 검사 훅 |
+| 다음 커밋 | 웹 Hosting 첫 배포 (https://meesae-app.web.app), `deploy:web` 이 에뮬레이터 모드를 끄고 빌드 |
 
 ## 테스트 중 고친 버그
 
