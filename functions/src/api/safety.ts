@@ -86,13 +86,28 @@ export const deleteAccount = callable('deleteAccount', {}, async ({ confirm }, c
     ...convs.docs.map((c) => b.deleteFiles({ prefix: `chat/${c.id}/${uid}/` })),
   ]);
 
+  // 상대가 이미 나간 대화는 내가 마지막이다 → 대화방·메시지·사진을 통째로 지운다.
+  // 상대가 남아 있으면 상대의 기록은 두고 대화방만 닫는다.
+  const lastOut = convs.docs.filter((c) => {
+    const left = (c.get('left') ?? {}) as Record<string, number>;
+    return (c.get('members') as string[]).every((m) => m === uid || left[m]);
+  });
+  const stays = convs.docs.filter((c) => !lastOut.includes(c));
+  await Promise.all(
+    lastOut.flatMap((c) => [
+      db.recursiveDelete(c.ref.collection(COL.messages)),
+      b.deleteFiles({ prefix: `chat/${c.id}/` }),
+    ]),
+  );
+
   const [pubSnap, privSnap] = await db.getAll(publicRef(uid), privateRef(uid));
   const pub = pubSnap!.data() as UserPublic | undefined;
   const priv = privSnap!.data() as UserPrivate | undefined;
 
   await db.runTransaction(async (tx) => {
     if (pub?.visible && pub.regionKey) moveRegionStat(tx, pub.regionKey, null);
-    for (const c of convs.docs) tx.update(c.ref, { closedBy: uid, [`left.${uid}`]: Date.now() });
+    for (const c of lastOut) tx.delete(c.ref);
+    for (const c of stays) tx.update(c.ref, { closedBy: uid, [`left.${uid}`]: Date.now() });
     if (priv?.phoneHash) tx.set(db.collection(COL.phoneIndex).doc(priv.phoneHash), { uid: null }, { merge: true });
   });
 

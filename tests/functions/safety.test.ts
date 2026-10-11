@@ -96,3 +96,23 @@ describe('휴대폰 인증', () => {
     expect(await errorCode(p2.call('claimPhoneVerified', {}))).toBe('PHONE_IN_USE');
   });
 });
+
+describe('탈퇴', () => {
+  it('한 명이 나가면 대화방은 닫히고 기록은 남는다, 마지막 사람이 나가면 통째로 지운다', async () => {
+    const x = await signIn('leave-x');
+    const y = await signIn('leave-y');
+    await Promise.all([onboard(x), onboard(y)]);
+    const { conversationId } = await x.call('startConversation', { targetUid: y.uid, clientRequestId: rid() });
+    await x.call('sendMessage', { conversationId, text: '안녕', clientRequestId: rid() });
+
+    await x.call('deleteAccount', { confirm: 'DELETE' });
+    const afterFirst = await admin.db.doc(`conversations/${conversationId}`).get();
+    expect(afterFirst.get('closedBy')).toBe(x.uid);
+    expect((await admin.db.collection(`conversations/${conversationId}/messages`).get()).size).toBe(1);
+
+    await y.call('deleteAccount', { confirm: 'DELETE' });
+    expect((await admin.db.doc(`conversations/${conversationId}`).get()).exists).toBe(false);
+    expect((await admin.db.collection(`conversations/${conversationId}/messages`).get()).size).toBe(0);
+    expect((await admin.db.doc(`users_public/${y.uid}`).get()).exists).toBe(false);
+  });
+});
