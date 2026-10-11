@@ -57,6 +57,7 @@
 | 팝업 차단 시 '문제가 생겼어요' 만 표시 | 실로그인 테스트 | 원인별 안내 |
 | 탈퇴한 상대가 '알 수 없음 + ?' | 실로그인 테스트 | '탈퇴한 사용자' + 아이콘 |
 | 다크 지도가 너무 어두워 안 보임 | 실로그인 테스트 | 후보 3개(fiord · CARTO · 직접 조정) 비교 후 직접 조정안 채택 |
+| 배포한 웹에서 아이콘이 전부 ⊠ (Ionicons 폰트 요청이 index.html 로 떨어짐) | 실서버 웹(모바일) | Hosting `ignore` 의 `**/node_modules/**` 제거 — expo export 가 폰트를 `dist/assets/node_modules/` 에 둔다 |
 | React Compiler 린트 14건 (effect 안 동기 setState 등) | 린트 | key 붙인 `useDoc/useQuery/useAsync`, `useNow` 패턴 |
 
 ## 사용자와 정한 것

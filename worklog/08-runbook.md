@@ -12,6 +12,7 @@
 - [첫 배포 대량 실패](#첫-배포-대량-실패)
 - [onAuthCreate 배포 실패](#onauthcreate-배포-실패)
 - [웹 지도가 빈 화면](#웹-지도가-빈-화면)
+- [웹 아이콘이 ⊠ 로 깨짐](#웹-아이콘이--로-깨짐)
 - [브라우저 자동화 제약](#브라우저-자동화-제약)
 
 ## 로컬 실행
@@ -107,6 +108,12 @@ gcloud run services add-iam-policy-binding <함수이름소문자> --region asia
 1. `public/maplibre/maplibre-gl-worker.mjs` 가 있는지 (`npm run postinstall`)
 2. 브라우저 탭이 숨겨져 있으면(`document.visibilityState === 'hidden'`) maplibre 가 안 그린다 — 코드 문제 아님
 3. 다크는 원래 어둡다. 확대해서 지명이 보이면 정상
+
+## 웹 아이콘이 ⊠ 로 깨짐
+
+아이콘 폰트(Ionicons)를 못 받은 것. `curl -sI https://meesae-app.web.app/assets/node_modules/@expo/vector-icons/.../Ionicons.<hash>.ttf`
+가 `text/html` 이면 Hosting 이 파일을 안 올리고 SPA rewrite 로 index.html 을 준 것이다.
+`firebase.json` 의 `hosting.ignore` 에 `node_modules` 패턴을 넣지 않는다 — expo export 는 폰트·이미지를 `dist/assets/node_modules/` 아래에 둔다.
 
 ## 브라우저 자동화 제약
 
