@@ -15,7 +15,7 @@ export interface MapViewProps {
   onMarkerPress?: (id: string) => void;
 }
 
-/** OpenFreeMap: 키 불필요, 전 세계 벡터 타일. 다크 모드는 dark 스타일 */
+/** OpenFreeMap: 키 불필요, 전 세계 벡터 타일. 다크는 이 스타일을 meesaeDark.ts 로 조정해서 쓴다 */
 export const MAP_STYLES = {
   light: 'https://tiles.openfreemap.org/styles/liberty',
   dark: 'https://tiles.openfreemap.org/styles/dark',

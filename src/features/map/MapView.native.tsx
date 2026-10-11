@@ -8,13 +8,16 @@ import { Pressable, View } from 'react-native';
 import { Text } from '@/ui/primitives';
 import { useColors, useScheme } from '@/ui/theme';
 
-import { MAP_STYLES, markerSize, type MapViewProps } from './types';
+import { markerSize, type MapViewProps } from './types';
+import { useMapStyle } from './useMapStyle';
 
 export function MapView({ center, zoom, markers, onMarkerPress }: MapViewProps) {
   const colors = useColors();
-  const scheme = useScheme();
+  const style = useMapStyle(useScheme());
+  // 다크 스타일을 받는 동안은 바탕색만 (조정 전 색이 비치지 않게)
+  if (!style) return <View style={{ flex: 1, backgroundColor: colors.bg }} />;
   return (
-    <Map style={{ flex: 1 }} mapStyle={MAP_STYLES[scheme]} attribution logo={false}>
+    <Map style={{ flex: 1 }} mapStyle={style as Parameters<typeof Map>[0]['mapStyle']} attribution logo={false}>
       <Camera initialViewState={{ center: [center.lng, center.lat], zoom }} />
       {markers.map((m) => {
         const size = markerSize(m.weight);
