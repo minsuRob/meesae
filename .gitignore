@@ -60,3 +60,4 @@ public/maplibre/
 
 # 실기기·실서버 테스트 캡처 (개인정보가 찍힐 수 있어 커밋하지 않는다)
 qa/
+public/qa-map/

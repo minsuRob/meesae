@@ -1,0 +1,112 @@
+# 08. 런북 — 자주 하는 작업과 문제 해결
+
+- [로컬 실행](#로컬-실행)
+- [실서버에 붙은 웹 실행](#실서버에-붙은-웹-실행)
+- [배포](#배포)
+- [실서버 스모크 테스트](#실서버-스모크-테스트)
+- [테스트 계정 정리](#테스트-계정-정리)
+- [새 언어 추가](#새-언어-추가)
+- [포인트 숫자 바꾸기](#포인트-숫자-바꾸기)
+- [새 서버 함수 추가](#새-서버-함수-추가)
+- [callable 이 401](#callable-이-401)
+- [첫 배포 대량 실패](#첫-배포-대량-실패)
+- [onAuthCreate 배포 실패](#onauthcreate-배포-실패)
+- [웹 지도가 빈 화면](#웹-지도가-빈-화면)
+- [브라우저 자동화 제약](#브라우저-자동화-제약)
+
+## 로컬 실행
+
+```bash
+npm install && npm --prefix functions install   # postinstall 이 maplibre 워커를 public/ 에 복사
+npm run emulators                               # Auth·Firestore·Functions·Storage, UI localhost:4000
+npm run seed                                    # 가짜 사용자 14명·게시물·지역 집계
+npm run web                                     # '개발용 로그인' 으로 들어간다
+```
+
+`.env` 의 `EXPO_PUBLIC_USE_EMULATOR=1` 이면 실서버에 아무것도 안 간다. 에뮬레이터 휴대폰 인증 코드는 Emulator UI Auth 탭.
+
+## 실서버에 붙은 웹 실행
+
+`.claude/launch.json` 의 `web-prod` (포트 8098). 직접 띄우려면:
+
+```bash
+EXPO_PUBLIC_USE_EMULATOR=0 npx expo start --web --port 8098 --clear
+```
+
+## 배포
+
+```bash
+npm run deploy:backend    # Functions 빌드 + Functions·Firestore·Storage
+npm run deploy:web        # expo export → Hosting (아직 안 함)
+```
+
+`beforeSignIn` 은 Identity Platform 전까지 빼고 배포한다 (`--only functions:이름,...`).
+
+## 실서버 스모크 테스트
+
+테스트 계정 2개로 가입→지오코딩→추천→매치→대화→Rules 거부→피드→포인트→차단→탈퇴까지 돌고 스스로 지운다.
+
+1. 이메일 로그인 켜기 (끝나면 반드시 끈다):
+   ```bash
+   TOKEN=$(gcloud auth print-access-token)
+   curl -s -X PATCH -H "Authorization: Bearer $TOKEN" -H "X-Goog-User-Project: meesae-app" -H "Content-Type: application/json" \
+     "https://identitytoolkit.googleapis.com/admin/v2/projects/meesae-app/config?updateMask=signIn.email.enabled,signIn.email.passwordRequired" \
+     -d '{"signIn":{"email":{"enabled":true,"passwordRequired":true}}}'
+   ```
+2. `GCLOUD_TOKEN=$(gcloud auth print-access-token) node scripts/smoke-prod.mjs --yes`
+3. 같은 요청에 `"enabled":false` 로 끈다
+
+## 테스트 계정 정리
+
+스모크가 중간에 죽어 `smoke-*@meesae.test` 계정이 남았을 때: Identity Toolkit REST(`accounts:query` → `accounts:update` 로 비밀번호 재설정)
+→ 그 계정으로 로그인 → `deleteAccount` 호출. 로컬 ADC 가 만료돼 있으면 Admin SDK 대신 gcloud 토큰 + `X-Goog-User-Project` 헤더로 REST.
+
+## 새 언어 추가
+
+1. `shared/i18n.ts` 의 `LOCALES` 에 코드 추가 (서버가 그 언어 지역 이름도 받아 둔다)
+2. `src/i18n/locales/<code>.ts` 를 `Catalog` 타입으로 작성 — 빠진 키는 tsc 가 잡는다
+3. `src/i18n/index.ts` 의 `CATALOGS` · `LOCALE_META` 에 등록 → 언어 선택 UI 에 자동으로 나온다
+4. `npm test` (카탈로그 일치 테스트) → Functions 재배포
+
+## 포인트 숫자 바꾸기
+
+- 기본값: `shared/economy.ts` 의 `ECONOMY` (앱·서버 같이 바뀜, 재배포 필요)
+- 운영 중 즉시: Firestore `config/economy` 문서에 같은 키로 숫자를 넣는다 (서버 5분 캐시)
+
+## 새 서버 함수 추가
+
+1. `shared/api.ts` 의 `Api` 에 요청·응답 타입
+2. `functions/src/api/*.ts` 에 `callable('이름', { action, rate }, handler)`
+3. `functions/src/index.ts` export → `npm run test:functions` → 배포
+4. 오류는 `appError('CODE')` — 새 코드면 `shared/api.ts` `APP_ERRORS` + 앱 카탈로그 `errors.CODE` (ko·en)
+
+## callable 이 401
+
+본문이 함수의 `{"error":{"status":"UNAUTHENTICATED"}}` 가 아니라 Cloud Run 거절이면 공개 호출 권한 누락. 재배포로는 안 붙는다.
+
+```bash
+gcloud run services get-iam-policy <함수이름소문자> --region asia-northeast3 --project meesae-app
+gcloud run services add-iam-policy-binding <함수이름소문자> --region asia-northeast3 --project meesae-app --member=allUsers --role=roles/run.invoker
+```
+
+반영까지 1~2분. 인증·권한 검사는 함수 안 `guard()` 가 한다.
+
+## 첫 배포 대량 실패
+
+`Compute Engine API has not been used` → `gcloud services enable compute.googleapis.com --project meesae-app` 후 재배포.
+
+## onAuthCreate 배포 실패
+
+`Firebase Auth is not enabled in the project` → 콘솔 Authentication "시작하기" 를 먼저.
+
+## 웹 지도가 빈 화면
+
+1. `public/maplibre/maplibre-gl-worker.mjs` 가 있는지 (`npm run postinstall`)
+2. 브라우저 탭이 숨겨져 있으면(`document.visibilityState === 'hidden'`) maplibre 가 안 그린다 — 코드 문제 아님
+3. 다크는 원래 어둡다. 확대해서 지명이 보이면 정상
+
+## 브라우저 자동화 제약
+
+Claude 브라우저 패널에서는 에이전트 클릭으로 연 팝업(구글 로그인·결제 창)과 위치 권한이 막힌다.
+로그인·결제·위치 허용은 사람이 하고, 이후 단계부터 이어서 자동화한다. 확인 창(`window.confirm`)은
+테스트 탭에서만 기록용으로 바꿔 끼워 진행했다.
