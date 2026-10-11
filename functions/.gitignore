@@ -1,0 +1,4 @@
+node_modules/
+/lib/
+# 에뮬레이터용 비밀값은 scripts/ensure-dev-secrets.mjs 가 만든다
+.secret.local
