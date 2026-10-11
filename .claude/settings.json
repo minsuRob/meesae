@@ -1,5 +1,20 @@
 {
   "enabledPlugins": {
     "expo@claude-plugins-official": true
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=$(jq -r '.tool_input.file_path // .tool_response.filePath // empty'); case \"$f\" in */worklog/*.md|*/CLAUDE.md) cd \"${CLAUDE_PROJECT_DIR:-.}\" && python3 worklog/check-links.py 1>&2 || exit 2 ;; esac",
+            "timeout": 30,
+            "statusMessage": "문서 링크 검사"
+          }
+        ]
+      }
+    ]
   }
 }

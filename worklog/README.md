@@ -60,5 +60,14 @@ meesae 작업 기록. **전부 읽지 말고, 아래 표에서 지금 필요한 
 ## 이 폴더 고치는 법
 
 - 새 주제는 새 파일(`09-…md`)로 만들고 위 두 표에 한 줄씩 추가
-- 섹션 제목을 바꾸면 링크가 깨진다 → 바꿨으면 `python3 worklog/check-links.py`
+- 섹션 제목을 바꾸면 링크가 깨진다 → 훅이 자동으로 `python3 worklog/check-links.py` 를 돌려 알려 준다
 - 원본 문서(`AGENTS.md`, `docs/*`)와 겹치는 내용은 복사하지 말고 링크
+
+## Claude 가 문서를 읽는 방식
+
+| 언제 | 무엇 | 비용 |
+|---|---|---|
+| 매 세션 자동 | 루트 `CLAUDE.md`(문서 길잡이 + 작업 후 갱신 규칙) + `AGENTS.md`(코드 규칙) | 짧게 유지 |
+| 그 폴더 파일을 열 때만 | `functions/` · `shared/` · `src/i18n/` · `src/ui/` 의 `CLAUDE.md` | 폴더별 5~7줄 |
+| 필요할 때만 | 이 README 의 표 → 해당 파일의 해당 섹션 | 섹션 단위 |
+| worklog·CLAUDE.md 를 고칠 때 | `.claude/settings.json` 의 PostToolUse 훅이 링크 검사, 깨지면 Claude 에게 알림 | 자동 |

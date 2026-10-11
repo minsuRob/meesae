@@ -1,4 +1,5 @@
-"""worklog/*.md 안의 상대 링크(파일#섹션)가 실제로 있는지 확인한다. GitHub 앵커 규칙으로 만든다.
+"""worklog/*.md 와 저장소의 CLAUDE.md 들 안의 상대 링크(파일#섹션)가 실제로 있는지 확인한다.
+GitHub 앵커 규칙으로 만든다.
 
     python3 worklog/check-links.py
 """
@@ -7,6 +8,16 @@ import re
 import sys
 
 ROOT = pathlib.Path(__file__).parent
+REPO = ROOT.parent
+SKIP = {"node_modules", ".git", ".expo", "dist", "lib"}
+
+
+def targets_to_check() -> list[pathlib.Path]:
+    files = sorted(ROOT.glob("*.md"))
+    for p in sorted(REPO.rglob("CLAUDE.md")):
+        if not SKIP.intersection(p.relative_to(REPO).parts):
+            files.append(p)
+    return files
 
 
 def slug(heading: str) -> str:
@@ -34,7 +45,7 @@ def anchors(path: pathlib.Path) -> set[str]:
 
 errors = []
 total = 0
-for md in sorted(ROOT.glob("*.md")):
+for md in targets_to_check():
     for target in re.findall(r"\]\(([^)\s]+)\)", md.read_text(encoding="utf-8")):
         if target.startswith(("http", "mailto:")):
             continue
@@ -42,9 +53,9 @@ for md in sorted(ROOT.glob("*.md")):
         file_part, _, frag = target.partition("#")
         dest = (md.parent / file_part) if file_part else md
         if not dest.exists():
-            errors.append(f"{md.name}: 파일 없음 → {target}")
+            errors.append(f"{md.relative_to(REPO)}: 파일 없음 → {target}")
         elif frag and frag not in anchors(dest):
-            errors.append(f"{md.name}: 섹션 없음 → {target}")
+            errors.append(f"{md.relative_to(REPO)}: 섹션 없음 → {target}")
 
 print(f"링크 {total}개 확인")
 for e in errors:

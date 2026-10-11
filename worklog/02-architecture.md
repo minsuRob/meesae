@@ -25,6 +25,8 @@ tests/               rules/ · functions/
 scripts/             seed-emulator · smoke-prod · copy-maplibre-worker · ensure-dev-secrets
 docs/                setup · decisions · cost
 worklog/             이 폴더
+CLAUDE.md            Claude 길잡이 (루트 + functions · shared · src/i18n · src/ui 폴더별)
+.claude/             settings.json(문서 링크 검사 훅) · launch.json(web · web-prod)
 ```
 
 ## 설계 원칙
