@@ -4,6 +4,7 @@
 - [실서버에 붙은 웹 실행](#실서버에-붙은-웹-실행)
 - [배포](#배포)
 - [Android APK 빌드와 검증](#android-apk-빌드와-검증)
+- [iOS 시뮬레이터 빌드](#ios-시뮬레이터-빌드)
 - [실서버 스모크 테스트](#실서버-스모크-테스트)
 - [테스트 계정 정리](#테스트-계정-정리)
 - [새 언어 추가](#새-언어-추가)
@@ -74,6 +75,22 @@ cd android && EXPO_PUBLIC_USE_EMULATOR=0 ./gradlew assembleRelease --no-daemon \
 - 조작은 `adb shell input tap/text`, 요소 좌표는 `uiautomator dump`, 화면은 `adb exec-out screencap -p`. 한글은 `input text` 로 못 넣는다
 - 위치: `adb emu geo fix <경도> <위도>`. 사진: `adb push x.jpg /sdcard/Pictures/` 후 미디어 스캔 브로드캐스트
 - 휴대폰 인증번호는 에뮬레이터 로그의 `use the code ...`
+
+## iOS 시뮬레이터 빌드
+
+```bash
+npx expo prebuild -p ios --no-install
+cd ios && LANG=en_US.UTF-8 pod install --repo-update     # UTF-8 아니면 CocoaPods 가 인코딩 오류로 죽는다
+EXPO_PUBLIC_USE_EMULATOR=0 xcodebuild -workspace meesae.xcworkspace -scheme meesae -configuration Release \
+  -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' -derivedDataPath build \
+  ARCHS=arm64 ONLY_ACTIVE_ARCH=YES CODE_SIGNING_ALLOWED=NO
+# → ios/build/Build/Products/Release-iphonesimulator/meesae.app  (xcrun simctl install <기기> meesae.app)
+```
+
+- `=0` 을 빼면 `.env` 대로 에뮬레이터(127.0.0.1)에 붙는다. iOS 는 ATS `NSAllowsLocalNetworking` 이라 http 로컬이 된다
+- RNFirebase 는 `app.json` 에서 SPM 을 끈다 (`ios.disableSPM`) — 정적 프레임워크와 같이 쓰면 pod install 이 막힌다
+- 사진·위치: `xcrun simctl addmedia <기기> a.jpg`, `xcrun simctl location <기기> set 37.5894,127.0167`
+- 실기기 .ipa 는 Apple 팀 서명 필요. 맥에 로그인된 인증서는 회사 팀 것이라 쓰지 않기로 함 (2026-10-12)
 
 ## 실서버 스모크 테스트
 

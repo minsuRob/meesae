@@ -57,7 +57,7 @@
 
 ## 검증 안 된 것
 
-- **iOS 네이티브 전부** (빌드 안 해 봄)
+- **iOS 화면 흐름** — 시뮬레이터 Release 빌드·설치·첫 화면(에뮬레이터용·실서버용)까지만. 시뮬레이터 조작 권한을 못 받아 탭 검증은 안 함. 실기기 빌드(.ipa)는 서명 팀 미정
 - **Android 실서버 Google 로그인** — 안드로이드 OAuth 클라이언트(SHA-1)가 없어 실패할 것 ([07 › P0](07-todo.md#p0-출시-차단)). 실기기 설치, Play Integrity(App Check)
 - 휴대폰 인증 실제 문자, 실시간 위치공유(시작·갱신·종료), 프로필 수정, 국가 변경, 차단 해제,
   신고 5회 자동 숨김, 게시물 삭제, 슈퍼라이크, 추가 필터 아이템, 만료 정리 스케줄러, 추천 '같은 구/시·도' 범위·다음 페이지
@@ -70,5 +70,6 @@
 
 - `qa/real-login/01~15` — 본인 계정 실서버 테스트 (로그인 → … → 탈퇴한 사용자 표시)
 - `qa/android/` — Android 에뮬레이터 화면(01~52)과 APK 두 개 (실서버용 `meesae-0.1.0-release.apk`, 에뮬레이터용 `meesae-emulator-test.apk`)
+- `qa/ios/` — iOS 시뮬레이터 화면, 시뮬레이터용 빌드 (`meesae-0.1.0-simulator.zip` 실서버용, `meesae-emulator-test.app`)
 - `qa/dark-map/` — 다크 지도 후보 비교(현재·A fiord·B CARTO·C meesae) + 앱 적용 화면
 - 지도 후보 미리보기 페이지: `public/qa-map/index.html?style=current|fiord|carto|meesae` (git 제외)
