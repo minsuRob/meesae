@@ -1,0 +1,59 @@
+# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
+
+# dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# local env files
+.env*.local
+
+# typescript
+*.tsbuildinfo
+
+# generated native folders
+/ios
+/android
+
+# 로컬 환경 변수 (.env.example 참고)
+.env
+
+# Firebase 에뮬레이터
+firebase-debug.log
+firestore-debug.log
+storage-debug.log
+ui-debug.log
+.emulator-data/
+.firebase/
+
+# maplibre 웹 워커 복사본 (npm install 때 postinstall 이 만든다)
+public/maplibre/
+
+# Functions 파라미터 파일은 비밀값이 없어 커밋한다 (비밀값은 Secret Manager · functions/.secret.local)
+!functions/.env
+!functions/.env.local

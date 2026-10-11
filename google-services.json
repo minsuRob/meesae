@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "243264628254",
+    "project_id": "meesae-app",
+    "storage_bucket": "meesae-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:243264628254:android:61bd6ed147014da33b700f",
+        "android_client_info": {
+          "package_name": "com.minsurob.meesae"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCsxMWqYiP0BX3L4bNI9iwdQkHGEz7AJ9g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
