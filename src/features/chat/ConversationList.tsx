@@ -1,6 +1,6 @@
 import { FlatList, Pressable, View } from 'react-native';
 
-import { otherMember, type Conversation, type UserPublic } from '@shared/models';
+import { otherMember, peerLeft, type Conversation, type UserPublic } from '@shared/models';
 
 import { queries, refs } from '@/firebase/collections';
 import { useDoc, useQuery } from '@/firebase/hooks';
@@ -39,6 +39,8 @@ function ConversationRow({ c, me, selected, onPress }: { c: Conversation; me: st
   const peer = useDoc(refs.userPublic(peerUid)).data as UserPublic | null;
   const avatar = useStorageUrl(peer?.photos[0]);
   const unread = c.unread?.[me] ?? 0;
+  const deleted = peerLeft(c, me);
+  const name = deleted ? t('chat.deletedUser') : (peer?.nickname ?? t('chat.unknownUser'));
   return (
     <Pressable
       onPress={onPress}
@@ -48,11 +50,13 @@ function ConversationRow({ c, me, selected, onPress }: { c: Conversation; me: st
       })}
     >
       <Row gap={space.md}>
-        <Avatar uri={avatar} name={peer?.nickname} size={48} />
+        <Avatar uri={avatar} name={peer?.nickname} size={48} icon={deleted ? 'person-remove-outline' : undefined} />
         <Stack gap={2} style={{ flex: 1 }}>
           <Row style={{ justifyContent: 'space-between' }}>
             <Row gap={space.xs}>
-              <Text variant="label">{peer?.nickname ?? t('chat.unknownUser')}</Text>
+              <Text variant="label" color={deleted ? colors.textMuted : undefined}>
+                {name}
+              </Text>
               {c.kind === 'match' ? <Badge label={t('chat.badgeMatch')} color={colors.primary} /> : null}
               {c.closedBy ? <Badge label={t('chat.badgeClosed')} color={colors.textMuted} /> : null}
             </Row>

@@ -8,7 +8,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { FlatList, KeyboardAvoidingView, Platform, Pressable, TextInput, View } from 'react-native';
 
 import { REPORT_REASONS, type ReportReason } from '@shared/api';
-import { otherMember, type Message, type UserPublic } from '@shared/models';
+import { otherMember, peerLeft, type Message, type UserPublic } from '@shared/models';
 import { can } from '@shared/permissions';
 import { LIMITS } from '@shared/validators';
 
@@ -97,6 +97,7 @@ export function ConversationView({ id, embedded }: { id: string; embedded?: bool
   if (conv.loading) return <Loading />;
   if (!conv.data || !me) return <Empty title={t('chat.notFound')} />;
   const closed = Boolean(conv.data.closedBy);
+  const deleted = peerLeft(conv.data, me);
   const canImage = can(claims, 'chat.sendImage');
   const canShare = can(claims, 'location.liveShare');
 
@@ -179,12 +180,15 @@ export function ConversationView({ id, embedded }: { id: string; embedded?: bool
             </Pressable>
           ) : null}
           <Pressable
+            disabled={deleted}
             onPress={() => peerUid && router.push({ pathname: '/profile/[uid]', params: { uid: peerUid } })}
             style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}
           >
-            <Avatar uri={peerAvatar} name={peer?.nickname} size={36} />
+            <Avatar uri={peerAvatar} name={peer?.nickname} size={36} icon={deleted ? 'person-remove-outline' : undefined} />
             <Stack gap={0}>
-              <Text variant="label">{peer?.nickname ?? t('chat.unknownUser')}</Text>
+              <Text variant="label" color={deleted ? colors.textMuted : undefined}>
+                {deleted ? t('chat.deletedUser') : (peer?.nickname ?? t('chat.unknownUser'))}
+              </Text>
               <Text variant="caption">{(peer && regionName(peer.regionLabels, peer.regionLabel, locale)) ?? ''}</Text>
             </Stack>
           </Pressable>
@@ -215,7 +219,7 @@ export function ConversationView({ id, embedded }: { id: string; embedded?: bool
 
       {closed ? (
         <Text variant="caption" center style={{ padding: space.lg }}>
-          {t('chat.closed')}
+          {deleted ? t('chat.closedDeleted') : t('chat.closed')}
         </Text>
       ) : (
         <Row style={{ padding: space.sm, borderTopWidth: 1, borderTopColor: colors.border }} gap={space.sm}>

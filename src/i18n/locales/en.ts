@@ -239,6 +239,8 @@ export const en: Catalog = {
     loadFailed: "Couldn't load your chats",
     notFound: "We couldn't find this chat",
     unknownUser: 'Unknown',
+    deletedUser: 'Deleted user',
+    closedDeleted: 'This person deleted their account, so the chat has ended',
     badgeMatch: 'Match',
     badgeClosed: 'Ended',
     newIntro: 'New chat started',

@@ -25,7 +25,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { font, layout, radius, space, useColors, useScheme, type Colors } from '../theme';
 
-export { Icon, type IconName } from './Icon';
+import { Icon, type IconName } from './Icon';
+
+export { Icon, type IconName };
 
 // ── Text ─────────────────────────────────────────────────────────────
 
@@ -259,15 +261,30 @@ export function Chip({ label, selected, onPress }: { label: string; selected?: b
 
 // ── Avatar ───────────────────────────────────────────────────────────
 
-export function Avatar({ uri, size = 40, name }: { uri?: string | null; size?: number; name?: string }) {
+export function Avatar({
+  uri,
+  size = 40,
+  name,
+  icon,
+}: {
+  uri?: string | null;
+  size?: number;
+  name?: string;
+  /** 사진 대신 보여 줄 아이콘 (탈퇴한 사용자 등) */
+  icon?: IconName;
+}) {
   const colors = useColors();
   const style = { width: size, height: size, borderRadius: size / 2, backgroundColor: colors.bgMuted };
-  if (uri) return <Image source={{ uri }} style={style} contentFit="cover" />;
+  if (uri && !icon) return <Image source={{ uri }} style={style} contentFit="cover" />;
   return (
     <View style={[style, { alignItems: 'center', justifyContent: 'center' }]}>
-      <Text variant="label" color={colors.textMuted}>
-        {name?.slice(0, 1) ?? '?'}
-      </Text>
+      {icon ? (
+        <Icon name={icon} size={Math.round(size * 0.5)} color={colors.textMuted} />
+      ) : (
+        <Text variant="label" color={colors.textMuted}>
+          {name?.slice(0, 1) ?? '?'}
+        </Text>
+      )}
     </View>
   );
 }

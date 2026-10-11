@@ -240,6 +240,8 @@ export const ko = {
     loadFailed: '대화 목록을 불러오지 못했어요',
     notFound: '대화를 찾을 수 없어요',
     unknownUser: '알 수 없음',
+    deletedUser: '탈퇴한 사용자',
+    closedDeleted: '상대가 탈퇴해서 대화가 종료됐어요',
     badgeMatch: '매치',
     badgeClosed: '종료',
     newIntro: '새 대화가 시작됐어요',

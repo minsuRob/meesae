@@ -145,6 +145,8 @@ export interface Conversation {
   readAt: Record<string, number>;
   /** 한쪽이 차단·탈퇴하면 채워진다. 이후 전송 불가 */
   closedBy: string | null;
+  /** 탈퇴한 멤버 → 탈퇴 시각. 앱은 이걸로 '탈퇴한 사용자' 를 표시한다 */
+  left?: Record<string, number>;
   createdAt: number;
   updatedAt: number;
 }
@@ -221,4 +223,9 @@ export function pairId(a: string, b: string): string {
 
 export function otherMember(members: readonly string[], me: string): string {
   return members.find((m) => m !== me) ?? me;
+}
+
+/** 대화 상대가 탈퇴했는가 */
+export function peerLeft(c: Pick<Conversation, 'members' | 'left'>, me: string): boolean {
+  return Boolean(c.left?.[otherMember(c.members, me)]);
 }
