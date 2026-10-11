@@ -5,7 +5,7 @@
 
 import { router } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { FlatList, KeyboardAvoidingView, Platform, Pressable, TextInput, View } from 'react-native';
+import { FlatList, Pressable, TextInput, View } from 'react-native';
 
 import { REPORT_REASONS, type ReportReason } from '@shared/api';
 import { otherMember, peerLeft, type Message, type UserPublic } from '@shared/models';
@@ -19,6 +19,7 @@ import { pickImage, uploadImage, useStorageUrl } from '@/firebase/storage';
 import { regionName, useT } from '@/i18n';
 import { useClaims, useUid } from '@/store/session';
 import { useWallet } from '@/store/wallet';
+import { KeyboardAvoid } from '@/ui/keyboard';
 import { confirm, notify } from '@/ui/notify';
 import { Avatar, Button, Chip, Empty, Icon, Loading, Photo, Row, Sheet, Stack, Text } from '@/ui/primitives';
 import { font, radius, space, useColors, useScheme } from '@/ui/theme';
@@ -171,7 +172,7 @@ export function ConversationView({ id, embedded }: { id: string; embedded?: bool
   }
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1, backgroundColor: colors.bg }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardAvoid style={{ flex: 1, backgroundColor: colors.bg }}>
       <Row style={{ padding: space.md, borderBottomWidth: 1, borderBottomColor: colors.border, justifyContent: 'space-between' }}>
         <Row gap={space.md}>
           {!embedded ? (
@@ -290,6 +291,6 @@ export function ConversationView({ id, embedded }: { id: string; embedded?: bool
           ))}
         </Stack>
       </Sheet>
-    </KeyboardAvoidingView>
+    </KeyboardAvoid>
   );
 }

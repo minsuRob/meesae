@@ -12,6 +12,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { useLocale } from '@/i18n';
 import { startSessionListener, useSession } from '@/store/session';
+import { KeyboardRoot } from '@/ui/keyboard';
 import { useColors, useScheme } from '@/ui/theme';
 
 SplashScreen.preventAutoHideAsync().catch(() => undefined);
@@ -63,19 +64,21 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={navTheme}>
       <SafeAreaProvider style={{ backgroundColor: colors.bg }}>
-        <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
-        <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}>
-          <Stack.Screen name="index" />
-          <Stack.Protected guard={!signedIn}>
-            <Stack.Screen name="(auth)" />
-          </Stack.Protected>
-          <Stack.Protected guard={signedIn && !onboarded}>
-            <Stack.Screen name="onboarding" />
-          </Stack.Protected>
-          <Stack.Protected guard={onboarded}>
-            <Stack.Screen name="(main)" />
-          </Stack.Protected>
-        </Stack>
+        <KeyboardRoot>
+          <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
+          <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}>
+            <Stack.Screen name="index" />
+            <Stack.Protected guard={!signedIn}>
+              <Stack.Screen name="(auth)" />
+            </Stack.Protected>
+            <Stack.Protected guard={signedIn && !onboarded}>
+              <Stack.Screen name="onboarding" />
+            </Stack.Protected>
+            <Stack.Protected guard={onboarded}>
+              <Stack.Screen name="(main)" />
+            </Stack.Protected>
+          </Stack>
+        </KeyboardRoot>
       </SafeAreaProvider>
     </ThemeProvider>
   );

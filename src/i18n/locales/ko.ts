@@ -124,6 +124,7 @@ export const ko = {
     unknown: '문제가 생겼어요. 잠시 후 다시 시도해 주세요',
     photoPermission: '사진 접근 권한이 필요해요. 설정에서 허용해 주세요',
     locationPermission: '위치 권한이 필요해요. 설정에서 허용해 주세요',
+    locationUnavailable: '지금 위치를 찾지 못했어요. 위치 서비스를 켜고 다시 시도해 주세요',
     uploadTooBig: '사진이 너무 커요 (최대 5MB)',
     phoneCodeWrong: '인증번호가 맞지 않아요',
     phoneTooMany: '요청이 너무 많아요. 잠시 후 다시 시도해 주세요',

@@ -16,7 +16,8 @@
 | 2 | **Identity Platform 업그레이드** → `beforeSignIn` 배포 | 콘솔 + CLI | 지금 정지는 함수 호출 단계에서만 막힘 |
 | 3 | **Apple 로그인** 설정 (또는 그때까지 버튼 숨김) | Apple Developer + 콘솔 | 지금 누르면 '준비 중' 안내 |
 | 4 | **휴대폰 인증** 켜기 · SMS 지역 정책 · 테스트 번호 · Android SHA 지문 | 콘솔 | 문자 건당 과금 |
-| 5 | **네이티브 개발 빌드** 검증 (로그인·전화 인증·지도·App Check) | 로컬 | `npx expo run:ios` / `run:android` |
+| 5 | **iOS 네이티브 빌드** 검증 (로그인·전화 인증·지도·App Check). Android 는 에뮬레이터 백엔드로 끝남 | 로컬 | [06 › Android 네이티브](06-testing.md#android-네이티브) |
+| 5a | **Android 업로드 키스토어** 만들고 그 SHA-1(+ Play 앱 서명 SHA-1)을 Firebase Android 앱에 등록 → `google-services.json` 다시 받기 | 로컬 + 콘솔 | 지금 APK 는 RN 템플릿 디버그 키(공개된 키)로 서명. SHA 없으면 안드로이드 Google 로그인·휴대폰 인증 실패 |
 | 6 | **법적 요건**: 위치기반서비스사업 신고 검토, 이용약관·개인정보처리방침 페이지 | 사용자 | 현재 문구만 있고 페이지 없음 |
 | 7 | 역지오코딩을 Google Geocoding 으로 (`GEOCODER=google` + 비밀값) | CLI | Nominatim 은 운영용 아님 |
 | 8 | **API 키 사용 제한** (허용 앱·도메인) | GCP 콘솔 | 저장소가 공개 |
@@ -42,6 +43,9 @@
 
 - 위치 단계를 건너뛰면 거리 버킷이 항상 '같은 나라' → 나중에 인증 유도 문구
 - 새로고침 시 온보딩은 저장된 단계로 돌아오지만, 첫 진입(`/`)은 항상 1단계부터 → 마지막 단계 기억
+- Android 하드웨어 뒤로가기: 다른 탭에서 연 화면(예: 채팅 → 휴대폰 인증)이 프로필 스택에 남아, 상대 프로필에서 뒤로 가면 그 화면이 나온다
+- `prebuild` 경고: Android 에서 `userInterfaceStyle` 을 쓰려면 `expo-system-ui` 필요 (다크 전환 자체는 지금도 됨, 루트 배경색만 영향)
+- 온보딩 사진 단계의 '3장 이상이면 보상' 문구 — 실제 조건은 선택 항목(학교 포함) 전부 + 사진 3장
 - 다크 지도 색 미세 조정은 `src/features/map/meesaeDark.ts` 의 `MEESAE_DARK` 만 고치면 된다
 
 ## 미정 정책

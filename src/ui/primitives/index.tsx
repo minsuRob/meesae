@@ -23,6 +23,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { KeyboardAvoid, KeyboardScrollView } from '../keyboard';
 import { font, layout, radius, space, useColors, useScheme, type Colors } from '../theme';
 
 import { Icon, type IconName } from './Icon';
@@ -78,9 +79,9 @@ export function Screen({ scroll, padded = true, narrow, edges = ['top'], style, 
   return (
     <SafeAreaView edges={edges} style={{ flex: 1, backgroundColor: colors.bg }}>
       {scroll ? (
-        <ScrollView contentContainerStyle={inner} keyboardShouldPersistTaps="handled" {...rest}>
+        <KeyboardScrollView contentContainerStyle={inner} keyboardShouldPersistTaps="handled" {...rest}>
           {children}
-        </ScrollView>
+        </KeyboardScrollView>
       ) : (
         <View style={[{ flex: 1 }, inner]} {...rest}>
           {children}
@@ -395,28 +396,30 @@ export function Sheet({
   const colors = useColors();
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <Pressable style={{ flex: 1, backgroundColor: colors.overlay, justifyContent: 'flex-end' }} onPress={onClose}>
-        <Pressable
-          onPress={(e) => e.stopPropagation()}
-          style={{
-            backgroundColor: colors.surface,
-            borderTopLeftRadius: radius.lg,
-            borderTopRightRadius: radius.lg,
-            padding: space.xl,
-            maxHeight: '85%',
-            width: '100%',
-            maxWidth: layout.contentMaxWidth,
-            alignSelf: 'center',
-          }}
-        >
-          {title ? (
-            <Text variant="heading" style={{ marginBottom: space.lg }}>
-              {title}
-            </Text>
-          ) : null}
-          <ScrollView keyboardShouldPersistTaps="handled">{children}</ScrollView>
+      <KeyboardAvoid style={{ flex: 1 }}>
+        <Pressable style={{ flex: 1, backgroundColor: colors.overlay, justifyContent: 'flex-end' }} onPress={onClose}>
+          <Pressable
+            onPress={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: colors.surface,
+              borderTopLeftRadius: radius.lg,
+              borderTopRightRadius: radius.lg,
+              padding: space.xl,
+              maxHeight: '85%',
+              width: '100%',
+              maxWidth: layout.contentMaxWidth,
+              alignSelf: 'center',
+            }}
+          >
+            {title ? (
+              <Text variant="heading" style={{ marginBottom: space.lg }}>
+                {title}
+              </Text>
+            ) : null}
+            <ScrollView keyboardShouldPersistTaps="handled">{children}</ScrollView>
+          </Pressable>
         </Pressable>
-      </Pressable>
+      </KeyboardAvoid>
     </Modal>
   );
 }

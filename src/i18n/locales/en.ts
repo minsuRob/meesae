@@ -123,6 +123,7 @@ export const en: Catalog = {
     unknown: 'Something went wrong. Please try again',
     photoPermission: 'We need access to your photos. You can allow it in Settings',
     locationPermission: 'We need your location. You can allow it in Settings',
+    locationUnavailable: "Couldn't find your location. Turn on location services and try again",
     uploadTooBig: 'That photo is too large (max 5MB)',
     phoneCodeWrong: "That code doesn't match",
     phoneTooMany: 'Too many attempts. Please try again later',

@@ -1,6 +1,5 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { ScrollView } from 'react-native';
 
 import type { Post } from '@shared/models';
 import { LIMITS } from '@shared/validators';
@@ -11,6 +10,7 @@ import { useDoc, useQuery } from '@/firebase/hooks';
 import { useStorageUrl } from '@/firebase/storage';
 import { timeAgo, useT } from '@/i18n';
 import { useClaims, useUid } from '@/store/session';
+import { KeyboardScrollView } from '@/ui/keyboard';
 import { confirm, notify } from '@/ui/notify';
 import { Avatar, Button, Divider, Empty, Input, Loading, Photo, Row, Stack, Text } from '@/ui/primitives';
 import { layout, space, useColors } from '@/ui/theme';
@@ -95,8 +95,9 @@ function PostBody({ post: p, embedded }: { post: Post; embedded?: boolean }) {
   }
 
   return (
-    <ScrollView
+    <KeyboardScrollView
       style={{ backgroundColor: colors.bg }}
+      keyboardShouldPersistTaps="handled"
       contentContainerStyle={{ padding: space.lg, gap: space.lg, maxWidth: layout.contentMaxWidth, width: '100%', alignSelf: 'center' }}
     >
       {!embedded ? <Button title={t('feed.backToFeed')} kind="ghost" small onPress={() => router.back()} style={{ alignSelf: 'flex-start' }} /> : null}
@@ -131,6 +132,6 @@ function PostBody({ post: p, embedded }: { post: Post; embedded?: boolean }) {
         <Button title={t('feed.submitComment')} small onPress={comment} loading={busy} disabled={!text.trim()} />
       </Row>
       <Text variant="caption">{t('feed.noContacts')}</Text>
-    </ScrollView>
+    </KeyboardScrollView>
   );
 }

@@ -41,7 +41,8 @@
 | `683161f` | 다크 지도를 meesae 다크(OpenFreeMap dark 색 조정)로 |
 | `b8c0cd5` | 작업 기록 `worklog/` 를 인덱스 방식으로 정리 + 링크 검사기 |
 | `8dc7c0e` | Claude 문서 자동 읽기: 루트 CLAUDE.md 길잡이, 폴더별 CLAUDE.md 4개, 문서 링크 검사 훅 |
-| 다음 커밋 | 웹 Hosting 첫 배포 (https://meesae-app.web.app), `deploy:web` 이 에뮬레이터 모드를 끄고 빌드 |
+| `9c60661` · `c2c1ef8` | 웹 Hosting 첫 배포 (https://meesae-app.web.app), `deploy:web` 이 에뮬레이터 모드를 끄고 빌드 |
+| 다음 커밋 | Android 첫 네이티브 빌드(APK)·에뮬레이터 전 흐름 검증, 그때 나온 버그 4개 수정 (`react-native-keyboard-controller` 추가) |
 
 ## 테스트 중 고친 버그
 
@@ -58,6 +59,9 @@
 | 탈퇴한 상대가 '알 수 없음 + ?' | 실로그인 테스트 | '탈퇴한 사용자' + 아이콘 |
 | 다크 지도가 너무 어두워 안 보임 | 실로그인 테스트 | 후보 3개(fiord · CARTO · 직접 조정) 비교 후 직접 조정안 채택 |
 | 배포한 웹에서 아이콘이 전부 ⊠ (Ionicons 폰트 요청이 index.html 로 떨어짐) | 실서버 웹(모바일) | Hosting `ignore` 의 `**/node_modules/**` 제거 — expo export 가 폰트를 `dist/assets/node_modules/` 에 둔다 |
+| Android: 키보드가 채팅 입력줄·글쓰기 시트·프로필 입력칸을 가림 (edge-to-edge 라 `adjustResize` 가 창을 안 줄임) | Android 에뮬레이터 | `src/ui/keyboard(.native).tsx` — 루트 `KeyboardProvider`, `Screen`·게시물 상세는 `KeyboardAwareScrollView`, 채팅·`Sheet` 는 `KeyboardAvoidingView`(padding, automaticOffset). 웹은 그대로 통과 |
+| Android: Google '위치 정확도' 창에서 '사용 안함' 이면 위치 인증이 '문제가 생겼어요' | Android 에뮬레이터 | 창 없이 GPS(High)로 재시도 → 최근 위치(10분) → `errors.locationUnavailable` |
+| Android: 지도 지역 원을 눌러도 반응 없음 (`ViewAnnotation` 이 자식을 비트맵으로 그려 `Pressable` 무시) | Android 에뮬레이터 | `ViewAnnotation` 의 `onPress` 로 |
 | React Compiler 린트 14건 (effect 안 동기 setState 등) | 린트 | key 붙인 `useDoc/useQuery/useAsync`, `useNow` 패턴 |
 
 ## 사용자와 정한 것

@@ -3,6 +3,7 @@
 - [로컬 실행](#로컬-실행)
 - [실서버에 붙은 웹 실행](#실서버에-붙은-웹-실행)
 - [배포](#배포)
+- [Android APK 빌드와 검증](#android-apk-빌드와-검증)
 - [실서버 스모크 테스트](#실서버-스모크-테스트)
 - [테스트 계정 정리](#테스트-계정-정리)
 - [새 언어 추가](#새-언어-추가)
@@ -45,6 +46,34 @@ npm run deploy:web        # expo export → Hosting (https://meesae-app.web.app)
 직접 `expo export` 할 때도 같은 값을 붙인다. 안 붙이면 웹이 demo 에뮬레이터에 붙는다.
 
 `beforeSignIn` 은 Identity Platform 전까지 빼고 배포한다 (`--only functions:이름,...`).
+
+## Android APK 빌드와 검증
+
+준비: Android Studio 의 JDK·SDK (`~/.zshrc` 에 `JAVA_HOME`·`ANDROID_HOME`). 처음 한 번 에뮬레이터와 이미지:
+
+```bash
+sdkmanager "emulator" "system-images;android-36;google_apis_playstore;arm64-v8a"
+avdmanager create avd -n meesae_api36 -k "system-images;android-36;google_apis_playstore;arm64-v8a" -d pixel_7
+```
+
+실서버용 APK (`android/` 는 git 제외, 생성물):
+
+```bash
+npx expo prebuild -p android --clean --no-install
+cd android && EXPO_PUBLIC_USE_EMULATOR=0 ./gradlew assembleRelease --no-daemon \
+  -PreactNativeArchitectures=arm64-v8a,armeabi-v7a --max-workers=4 -Dorg.gradle.jvmargs="-Xmx4g -XX:MaxMetaspaceSize=1g"
+# → android/app/build/outputs/apk/release/app-release.apk (디버그 키 서명)
+```
+
+에뮬레이터 백엔드용 APK: `.env` 그대로(`=1`) 빌드하되, 릴리스는 http 를 막으므로 생성된
+`android/app/src/main/AndroidManifest.xml` 의 `<application>` 에 `android:usesCleartextTraffic="true"` 를 손으로 넣는다
+(prebuild `--clean` 하면 사라진다 — 실서버 APK 에는 넣지 않는다). 에뮬레이터는 `10.0.2.2` 로 맥의 Firebase 에뮬레이터에 붙는다.
+
+- 맥 메모리 16GB 에서 Gradle 과 에뮬레이터를 같이 돌리면 에뮬레이터가 멈추거나 Gradle 데몬이 죽는다 → 빌드할 땐 `adb emu kill`
+- 창 모드 에뮬레이터가 한 번 죽은 뒤로는 부팅이 멈췄다 → `emulator -avd meesae_api36 -no-window -no-snapshot -gpu swiftshader_indirect -memory 3072`
+- 조작은 `adb shell input tap/text`, 요소 좌표는 `uiautomator dump`, 화면은 `adb exec-out screencap -p`. 한글은 `input text` 로 못 넣는다
+- 위치: `adb emu geo fix <경도> <위도>`. 사진: `adb push x.jpg /sdcard/Pictures/` 후 미디어 스캔 브로드캐스트
+- 휴대폰 인증번호는 에뮬레이터 로그의 `use the code ...`
 
 ## 실서버 스모크 테스트
 
