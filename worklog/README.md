@@ -3,7 +3,7 @@
 meesae 작업 기록. **전부 읽지 말고, 아래 표에서 지금 필요한 칸만 따라간다.**
 각 파일은 맨 위에 목차가 있고, 한 파일에 한 주제만 있다.
 
-마지막 갱신: 2026-10-12 · Android 실기기 Google 로그인 (디버그 키 SHA 등록) · UI 일괄 개선 main 병합 · 원본 규칙은 루트 `AGENTS.md`
+마지막 갱신: 2026-10-12 · Android 실기기 Google 로그인 (디버그 키 SHA 등록) · 기본 브랜치를 develop 하나로 정리 · 원본 규칙은 루트 `AGENTS.md`
 
 ## 이럴 땐 여기
 
@@ -53,8 +53,8 @@ meesae 작업 기록. **전부 읽지 말고, 아래 표에서 지금 필요한 
 
 ## 상태 요약
 
-- 코드: 웹·iOS·Android 한 코드베이스, 기능 전부 구현, 한국어·영어, 라이트·다크(지도는 meesae 다크). `main` 에 푸시됨
-- UI: Airbnb 디자인 언어로 토큰·primitives·전 화면 개편, Pretendard. `main` 에 병합 (웹 전 흐름·iOS/Android 폰트·탭바·다크 런치·Android 온보딩 키보드 확인, 햅틱·iOS 키보드·Android 시트 키보드는 미확인 → [06](06-testing.md#ui-일괄-개선-확인-2026-10-12) · [07 › UI 일괄 개선 후속](07-todo.md#ui-일괄-개선-후속))
+- 코드: 웹·iOS·Android 한 코드베이스, 기능 전부 구현, 한국어·영어, 라이트·다크(지도는 meesae 다크). 기본 브랜치 `develop` 하나 (main·ui/airbnb-light 는 2026-10-12 에 합치고 삭제)
+- UI: Airbnb 디자인 언어로 토큰·primitives·전 화면 개편, Pretendard. `develop` 에 반영 (웹 전 흐름·iOS/Android 폰트·탭바·다크 런치·Android 온보딩 키보드 확인, 햅틱·iOS 키보드·Android 시트 키보드는 미확인 → [06](06-testing.md#ui-일괄-개선-확인-2026-10-12) · [07 › UI 일괄 개선 후속](07-todo.md#ui-일괄-개선-후속))
 - 서버: `meesae-app`(Blaze) — Firestore·Storage(서울), Rules·인덱스, Functions 29개, 웹 https://meesae-app.web.app. `beforeSignIn` 보류
 - 로그인: Google 만 켜짐. Apple·휴대폰 미설정
 - 테스트: 단위 41 · Rules 22 · Functions 통합 16 · 실서버 스모크 18 전부 통과, 본인 구글 계정으로 실서버 웹 흐름 확인

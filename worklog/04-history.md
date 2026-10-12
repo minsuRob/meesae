@@ -82,7 +82,7 @@
 
 ## UI 일괄 개선
 
-2026-10-12, 브랜치 `ui/airbnb-light`. 계획서 `~/.claude/plans/tender-watching-noodle.md`.
+2026-10-12, 브랜치 `ui/airbnb-light` (지금은 `develop` 에 합쳐지고 삭제됨). 계획서 `~/.claude/plans/tender-watching-noodle.md`.
 
 | 커밋 | 내용 |
 |---|---|
