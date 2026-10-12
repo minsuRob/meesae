@@ -46,6 +46,7 @@
 | `658bf94` | Android 첫 네이티브 빌드(APK)·에뮬레이터 전 흐름 검증, 그때 나온 버그 4개 수정 (`react-native-keyboard-controller` 추가) |
 | `4b816b6` | iOS 첫 시뮬레이터 빌드: RNFirebase SPM 끄기(`app.json` 의 `ios.disableSPM`) — `useFrameworks: static` 과 충돌 |
 | `7cf9ed5` | iOS 시뮬레이터 전 흐름 검증, 사진 선택 전 권한 요청 제거 |
+| `fdc72b1` | `.env` 공유: Secret Manager `dotenv` + `npm run env:pull · env:push · env:diff` (`scripts/env.mjs`) |
 
 ## 테스트 중 고친 버그
 

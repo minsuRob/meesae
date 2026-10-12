@@ -3,7 +3,7 @@
 meesae 작업 기록. **전부 읽지 말고, 아래 표에서 지금 필요한 칸만 따라간다.**
 각 파일은 맨 위에 목차가 있고, 한 파일에 한 주제만 있다.
 
-마지막 갱신: 2026-10-12 · Android 실기기 Google 로그인 (디버그 키 SHA 등록) · 기본 브랜치를 develop 하나로 정리 · 원본 규칙은 루트 `AGENTS.md`
+마지막 갱신: 2026-10-12 · `.env` 를 Secret Manager 로 공유 (`npm run env:pull`) · Android 실기기 Google 로그인 · 기본 브랜치 develop · 원본 규칙은 루트 `AGENTS.md`
 
 ## 이럴 땐 여기
 
