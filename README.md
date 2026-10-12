@@ -18,7 +18,34 @@ npm run seed                    # 터미널 2: 가짜 사용자 14명·게시물
 npm run web                     # 터미널 2: 로그인 화면의 '개발용 로그인' 으로 들어간다
 ```
 
-`.env` 를 고쳤으면 `npm run env:push` 로 올린다. 기기마다 다른 값(`EXPO_PUBLIC_EMULATOR_HOST` 등)은 `.env.local` 에.
+## 환경 변수 (.env) 공유
+
+루트 `.env` 의 원본은 GCP Secret Manager(`meesae-app` 프로젝트의 비밀값 `dotenv`)에 있다.
+Google 계정으로 `gcloud` 에 로그인만 하면 어느 PC 에서든 같은 `.env` 를 받는다.
+
+처음 한 번:
+
+```bash
+gcloud auth login               # meesae-app 에 Secret Manager 접근 권한이 있는 계정
+npm run env:pull                # → .env 생성
+```
+
+평소:
+
+| 하고 싶은 것 | 명령 | 비고 |
+|---|---|---|
+| 최신 값 받기 | `npm run env:pull` | 로컬과 다르면 차이(키 이름)만 보여 주고 멈춘다 |
+| 받아서 덮어쓰기 | `npm run env:pull -- --force` | 기존 파일은 `.env.bak` 으로 남는다 |
+| 고친 값 올리기 | `npm run env:push` | 새 버전으로 올라간다. 원격에만 있는 키를 지우게 되면 멈춘다 |
+| 키를 지운 채로 올리기 | `npm run env:push -- --force` | 정말 지울 때만 |
+| 무엇이 다른지 보기 | `npm run env:diff` | 키 이름만 출력, 값은 안 보여 준다 |
+
+- 기기마다 다른 값(`EXPO_PUBLIC_USE_EMULATOR` · `EXPO_PUBLIC_EMULATOR_HOST`)은 `.env.local` 에 둔다. Expo 가 `.env` 보다 먼저 읽고, git 에 안 올라간다
+- 원격에는 최근 2개 버전만 남는다. 바로 전 값으로 되돌리기:
+  `gcloud secrets versions list dotenv --project=meesae-app` 로 번호를 보고
+  `gcloud secrets versions access <번호> --secret=dotenv --project=meesae-app > .env`
+- 권한이 없는 사람은 `cp .env.example .env` 로 에뮬레이터 전용 설정만 쓸 수 있다
+- 자세한 동작: [worklog/08 › .env 공유](worklog/08-runbook.md#env-공유-secret-manager)
 
 ## 테스트
 
