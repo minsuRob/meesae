@@ -86,7 +86,8 @@
 | 커밋 | 내용 |
 |---|---|
 | b817afc | 토큰(`tokens.ts`)·primitives 분할·전 화면 재배치·Pretendard·다크 스플래시·시안 HTML |
-| (다음 커밋) | 다크 팔레트 정리, `/dev/ui` 갤러리, 웹 `<button>` 중첩 제거, 입력 포커스 테두리, 작업 기록 |
+| 4283ead | 다크 팔레트 정리, `/dev/ui` 갤러리, 웹 `<button>` 중첩 제거, 입력 포커스 테두리, 작업 기록 |
+| (다음 커밋) | 검증 세션: 대화방 헤더 '알 수 없음' 깜빡임 제거, 06-testing 에 웹·iOS·Android 확인 결과 |
 
 절차: App Store 스크린샷(글램·위피·튤립·윌유)과 다크모드 블로그 분석 → Taste Skill·Vercel Web Interface Guidelines·awesome-design-md 규칙을 읽고
 브랜드 4안을 HTML 한 장(`docs/ui-prototypes/light-directions.html`)으로 비교 → Airbnb 안 선택 → `DESIGN.md` 값을 토큰에 옮김.
@@ -97,4 +98,4 @@
 - 추천 화면은 2열 그리드 + 사진 카드 유지 (글램식 1열 풀블리드 아님)
 - 디자인 방향은 Airbnb 안. 다크모드도 같은 언어로 (오프블랙 캔버스, 말풍선은 라이트의 잉크를 뒤집은 밝은 말풍선)
 - 글꼴은 Pretendard
-- 검증은 다른 세션에서 한다 (이 세션은 웹 라이트·다크 캡처까지)
+- 검증은 다른 세션에서 한다 (이 세션은 웹 라이트·다크 캡처까지) → 그 검증 결과는 [06](06-testing.md#ui-일괄-개선-확인-2026-10-12)

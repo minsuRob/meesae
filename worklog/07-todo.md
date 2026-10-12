@@ -42,7 +42,9 @@
 
 ## UI 일괄 개선 후속
 
-- 네이티브 확인: `npx expo run:ios` / `run:android` 로 Pretendard 임베드·다크 스플래시·Sheet(키보드)·탭바 인셋·햅틱
+- 네이티브 남은 확인: 햅틱, iOS 화면 키보드(시트·채팅 입력줄), Android 다크 스플래시·시트 키보드·채팅 입력줄 (Pretendard 임베드·iOS 탭바 인셋·다크 런치·Android 온보딩 키보드는 확인함 → [06](06-testing.md#ui-일괄-개선-확인-2026-10-12))
+- 웹 남은 확인: 375px·1024px 라이트/다크 캡처(패널이 숨겨져 못 봄), 로그아웃
+- 로그인 화면 개발용 입력칸이 Android 키보드에 가림 (`Screen` 에 `scroll` 없음, 에뮬레이터 전용이라 급하지 않음)
 - 접속 중 점: `ProfileCard`(shared/api.ts)에 `lastActiveAt` 을 더하고 `functions/src/api/discover.ts` `toCard()` 에서 넘기면 `Pill tone="online"`·`Avatar online` 이 바로 쓴다
 - 다크 지도 스타일(`meesaeDark.ts`)의 배경을 새 다크 `bg`(#121212)에 맞출지 결정
 - 앱 아이콘은 아직 Expo 기본. 스플래시 배경은 흰색/오프블랙으로 바꿨다

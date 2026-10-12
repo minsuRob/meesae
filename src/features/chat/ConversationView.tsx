@@ -114,7 +114,8 @@ export function ConversationView({ id, embedded }: { id: string; embedded?: bool
   const [limitN, setLimitN] = useState(PAGE);
   const msgs = useQuery(queries.recentMessages(id, limitN), `msgs:${id}:${limitN}`);
   const peerUid = conv.data && me ? otherMember(conv.data.members, me) : null;
-  const peer = useDoc(peerUid ? refs.userPublic(peerUid) : null).data as UserPublic | null;
+  const peerDoc = useDoc(peerUid ? refs.userPublic(peerUid) : null);
+  const peer = peerDoc.data as UserPublic | null;
   const peerAvatar = useStorageUrl(peer?.photos[0]);
   const now = useNow();
   const readReceipt = useWallet((s) => (s.wallet?.perks.readReceipt ?? 0) > now);
@@ -142,7 +143,7 @@ export function ConversationView({ id, embedded }: { id: string; embedded?: bool
   const deleted = peerLeft(conv.data, me);
   const canImage = can(claims, 'chat.sendImage');
   const canShare = can(claims, 'location.liveShare');
-  const peerName = deleted ? t('chat.deletedUser') : (peer?.nickname ?? t('chat.unknownUser'));
+  const peerName = deleted ? t('chat.deletedUser') : peerDoc.loading ? '' : (peer?.nickname ?? t('chat.unknownUser'));
 
   async function send() {
     const body = text.trim();
