@@ -12,11 +12,13 @@
 ```bash
 npm install
 npm --prefix functions install
-cp .env.example .env            # EXPO_PUBLIC_USE_EMULATOR=1 로 두면 실제 프로젝트에 아무것도 안 간다
+npm run env:pull               # .env 를 Secret Manager 에서 받는다 (gcloud auth login 필요). 권한이 없으면 cp .env.example .env
 npm run emulators               # 터미널 1: Auth·Firestore·Functions·Storage (UI: localhost:4000)
 npm run seed                    # 터미널 2: 가짜 사용자 14명·게시물·지역 집계
 npm run web                     # 터미널 2: 로그인 화면의 '개발용 로그인' 으로 들어간다
 ```
+
+`.env` 를 고쳤으면 `npm run env:push` 로 올린다. 기기마다 다른 값(`EXPO_PUBLIC_EMULATOR_HOST` 등)은 `.env.local` 에.
 
 ## 테스트
 

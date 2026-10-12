@@ -1,6 +1,7 @@
 # 08. 런북 — 자주 하는 작업과 문제 해결
 
 - [로컬 실행](#로컬-실행)
+- [.env 공유 (Secret Manager)](#env-공유-secret-manager)
 - [실서버에 붙은 웹 실행](#실서버에-붙은-웹-실행)
 - [배포](#배포)
 - [Android APK 빌드와 검증](#android-apk-빌드와-검증)
@@ -28,6 +29,22 @@ npm run web                                     # '개발용 로그인' 으로 �
 ```
 
 `.env` 의 `EXPO_PUBLIC_USE_EMULATOR=1` 이면 실서버에 아무것도 안 간다. 에뮬레이터 휴대폰 인증 코드는 Emulator UI Auth 탭.
+
+## .env 공유 (Secret Manager)
+
+루트 `.env` 원본은 `meesae-app` 의 Secret Manager 비밀값 `dotenv` 다. `scripts/env.mjs` 가 `gcloud` 로 읽고 쓴다.
+
+```bash
+gcloud auth login          # 새 PC 에서 한 번
+npm run env:pull           # 원격 → .env (로컬과 다르면 --force, 기존 파일은 .env.bak)
+npm run env:push           # .env → 새 버전 (원격에만 있는 키를 지우게 되면 --force)
+npm run env:diff           # 키 이름 단위 차이 (값은 출력 안 함)
+```
+
+- 프로젝트는 `.firebaserc` 의 default 를 쓴다. gcloud 기본 프로젝트가 다른 곳이어도 상관없다
+- push 할 때 최근 2개 버전만 남기고 파기한다 (무료 범위: 활성 버전 6개). 되돌리려면 `gcloud secrets versions access <n> --secret=dotenv --project=meesae-app`
+- 기기마다 다른 값(`EXPO_PUBLIC_USE_EMULATOR` · `EXPO_PUBLIC_EMULATOR_HOST`)은 `.env.local` 에 둔다 (Expo 가 `.env` 보다 먼저 읽고, gitignore 됨)
+- `dotenv` 는 Firebase 가 만든 비밀값이 아니라 `firebase functions:secrets:prune` 대상이 아니다
 
 ## 실서버에 붙은 웹 실행
 

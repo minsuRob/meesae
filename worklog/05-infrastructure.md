@@ -51,13 +51,14 @@
 
 | 파일 | 커밋 | 내용 |
 |---|---|---|
-| `.env` | ✗ | 웹 구성, `EXPO_PUBLIC_USE_EMULATOR`, 구글 웹 클라이언트 ID — `.env.example` 참고 |
+| `.env` | ✗ | 웹 구성, `EXPO_PUBLIC_USE_EMULATOR`, 구글 웹 클라이언트 ID — 원본은 Secret Manager `dotenv` (`npm run env:pull`, [08](08-runbook.md#env-공유-secret-manager)) |
 | `functions/.env` | ✓ | `ENFORCE_APP_CHECK=false`, `GEOCODER=nominatim` (비밀값 없음) |
 | `functions/.env.local` | ✓ | 에뮬레이터용 덮어쓰기 |
 | `functions/.env.demo-meesae-test` | ✓ | 테스트용 `GEOCODER=fake` |
 | `functions/.secret.local` | ✗ | 에뮬레이터용 더미 비밀값 (없으면 `scripts/ensure-dev-secrets.mjs` 가 만든다) |
 | `GoogleService-Info.plist` · `google-services.json` | ✓ | 네이티브 구성 (Google 로그인 반영본) |
 | Secret Manager `PHONE_HASH_PEPPER` | — | 무작위 값으로 등록됨 |
+| Secret Manager `dotenv` | — | 루트 `.env` 전체. push 때 최근 2개 버전만 남김 |
 
 저장소가 **공개**다. 클라이언트 API 키는 비밀이 아니지만, GCP 콘솔에서 키 사용 제한을 걸 것 (07-todo P0).
 

@@ -19,6 +19,9 @@
     "deploy:backend": "npm --prefix functions run build && firebase deploy --only functions,firestore,storage",
     "emulators:persist": "node scripts/ensure-dev-secrets.mjs && npm --prefix functions run build && firebase emulators:start --project demo-meesae --import .emulator-data --export-on-exit .emulator-data",
     "seed": "node scripts/seed-emulator.mjs",
+    "env:pull": "node scripts/env.mjs pull",
+    "env:push": "node scripts/env.mjs push",
+    "env:diff": "node scripts/env.mjs diff",
     "postinstall": "node scripts/copy-maplibre-worker.mjs"
   },
   "dependencies": {
