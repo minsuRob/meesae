@@ -4,7 +4,7 @@
  */
 
 import { router } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { View } from 'react-native';
 
 import type { UserPublic } from '@shared/models';
@@ -18,6 +18,7 @@ import { useClaims, useUid } from '@/store/session';
 import { notify } from '@/ui/notify';
 import { Button, Card, Empty, Loading, Row, Text } from '@/ui/primitives';
 import { space, useColors } from '@/ui/theme';
+import { useNow } from '@/ui/useNow';
 
 import { currentCoords } from '../location/current';
 import { MapView } from '../map/MapView';
@@ -35,16 +36,11 @@ export function LocationShareView({ id }: { id: string }) {
   const me = useUid();
   const claims = useClaims();
   const share = useDoc(refs.share(id));
-  const [now, setNow] = useState(() => Date.now());
+  const now = useNow(1000);
   const peerUid = share.data?.members.find((m) => m !== me);
   const peerName = useNickname(peerUid);
 
   const active = Boolean(share.data && share.data.expiresAt > now);
-
-  useEffect(() => {
-    const timer = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(timer);
-  }, []);
 
   useEffect(() => {
     if (!active || !can(claims, 'location.liveShare')) return;

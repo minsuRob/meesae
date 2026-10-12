@@ -11,6 +11,7 @@ import { FlatList, TextInput, View } from 'react-native';
 import { REPORT_REASONS, type ReportReason } from '@shared/api';
 import { otherMember, peerLeft, type Message, type UserPublic } from '@shared/models';
 import { can } from '@shared/permissions';
+import { isOnline } from '@shared/presence';
 import { LIMITS } from '@shared/validators';
 
 import { call, newRequestId, toApiError } from '@/firebase/api';
@@ -144,6 +145,7 @@ export function ConversationView({ id, embedded }: { id: string; embedded?: bool
   const canImage = can(claims, 'chat.sendImage');
   const canShare = can(claims, 'location.liveShare');
   const peerName = deleted ? t('chat.deletedUser') : peerDoc.loading ? '' : (peer?.nickname ?? t('chat.unknownUser'));
+  const online = !deleted && isOnline(peer?.lastActiveAt, now);
 
   async function send() {
     const body = text.trim();
@@ -229,7 +231,7 @@ export function ConversationView({ id, embedded }: { id: string; embedded?: bool
             onPress={() => peerUid && router.push({ pathname: '/profile/[uid]', params: { uid: peerUid } })}
             style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}
           >
-            <Avatar uri={peerAvatar} name={peer?.nickname} size="sm" icon={deleted ? 'person-remove-outline' : undefined} />
+            <Avatar uri={peerAvatar} name={peer?.nickname} size="sm" icon={deleted ? 'person-remove-outline' : undefined} online={online} />
             <Stack gap={0}>
               <Text variant="subtitle" tone={deleted ? 'muted' : 'default'}>
                 {peerName}

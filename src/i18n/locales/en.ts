@@ -220,6 +220,7 @@ export const en: Catalog = {
     anyone: 'Everyone',
     ageRange: (p: { min: number; max: number }) => `${p.min}-${p.max}`,
     verified: 'Verified',
+    online: 'Online',
   },
 
   filters: {

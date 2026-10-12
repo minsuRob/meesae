@@ -7,11 +7,13 @@ import { useState } from 'react';
 import { View } from 'react-native';
 
 import type { ProfileCard } from '@shared/api';
+import { isOnline } from '@shared/presence';
 
 import { useStorageUrl } from '@/firebase/storage';
 import { regionName, useT } from '@/i18n';
 import { Icon, Photo, Pill, Press, Row, Stack, Text } from '@/ui/primitives';
 import { space, useColors } from '@/ui/theme';
+import { useNow } from '@/ui/useNow';
 
 import { likeUser, startConversation } from './actions';
 
@@ -54,6 +56,8 @@ export function ProfileCardView({
   const region = regionName(p.regionLabels, p.regionLabel, locale);
   const [liking, setLiking] = useState(false);
   const verified = p.badges.includes('phone');
+  const now = useNow(60_000);
+  const online = isOnline(p.lastActiveAt, now);
   const open = () => (onOpen ? onOpen(p.uid) : router.push({ pathname: '/profile/[uid]', params: { uid: p.uid } }));
 
   return (
@@ -62,9 +66,10 @@ export function ProfileCardView({
         <Press onPress={open} haptic={false} pressScale={0.99} accessibilityRole="button" accessibilityLabel={p.nickname}>
           <View>
             <Photo source={photo ? { uri: photo } : undefined} />
-            {verified ? (
-              <View style={{ position: 'absolute', top: space.md, left: space.md }}>
-                <Pill label={t('discover.verified')} tone="onPhoto" icon="checkmark-circle" />
+            {online || verified ? (
+              <View style={{ position: 'absolute', top: space.md, left: space.md, gap: space.xs, alignItems: 'flex-start' }}>
+                {online ? <Pill label={t('discover.online')} tone="online" /> : null}
+                {verified ? <Pill label={t('discover.verified')} tone="onPhoto" icon="checkmark-circle" /> : null}
               </View>
             ) : null}
           </View>

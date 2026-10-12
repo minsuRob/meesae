@@ -7,6 +7,7 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { FlatList, View } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import type { DiscoverFilters } from '@shared/models';
@@ -24,7 +25,7 @@ import { useUid } from '@/store/session';
 import { SplitPane } from '@/ui/layout/SplitPane';
 import { useLayoutMode } from '@/ui/layout/useLayoutMode';
 import { Button, Empty, Icon, Press, Row, SkeletonList, Stack, Tabs, Text } from '@/ui/primitives';
-import { control, radius, space, useColors, useElevation } from '@/ui/theme';
+import { control, motion, radius, space, useColors, useElevation } from '@/ui/theme';
 
 type Tab = 'discover' | 'chats';
 
@@ -112,10 +113,10 @@ function DiscoverList({ columns, onOpen }: { columns: number; onOpen: (uid: stri
       keyExtractor={(p) => p.uid}
       contentContainerStyle={{ paddingHorizontal: space.lg, paddingTop: space.sm, paddingBottom: space.xxl, gap: space.xl }}
       columnWrapperStyle={columns > 1 ? { gap: space.lg } : undefined}
-      renderItem={({ item }) => (
-        <View style={{ flex: 1 / columns }}>
+      renderItem={({ item, index }) => (
+        <Animated.View entering={FadeInDown.duration(motion.duration.slow).delay(Math.min(index, 5) * 40)} style={{ flex: 1 / columns }}>
           <ProfileCardView p={item} onLiked={rec.markLiked} onOpen={onOpen} />
-        </View>
+        </Animated.View>
       )}
       onEndReached={() => rec.hasMore && !rec.loading && rec.loadMore()}
       onEndReachedThreshold={0.5}

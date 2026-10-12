@@ -7,6 +7,7 @@ import { router } from 'expo-router';
 
 import { ApiError, call, newRequestId, toApiError } from '@/firebase/api';
 import { translate } from '@/i18n';
+import { haptic } from '@/ui/haptics';
 import { confirm, notify } from '@/ui/notify';
 
 async function handle(e: unknown): Promise<null> {
@@ -28,6 +29,7 @@ export async function likeUser(targetUid: string, superLike = false) {
   try {
     const res = await call('likeUser', { targetUid, superLike, clientRequestId: newRequestId() });
     if (res.matched && res.conversationId) {
+      haptic('success');
       const go = await confirm(
         translate('discover.matchedTitle'),
         translate('discover.matchedBody'),

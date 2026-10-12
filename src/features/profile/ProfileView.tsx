@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { FlatList, ScrollView, View } from 'react-native';
 
 import { REPORT_REASONS, type ProfileCard, type ReportReason } from '@shared/api';
+import { isOnline } from '@shared/presence';
 
 import { call, toApiError } from '@/firebase/api';
 import { useAsync } from '@/firebase/hooks';
@@ -16,6 +17,7 @@ import { regionName, useT } from '@/i18n';
 import { confirm, notify } from '@/ui/notify';
 import { Button, Empty, Icon, IconButton, ListGroup, ListRow, Loading, Photo, PhotoScrim, Pill, Row, Sheet, Stack, Text } from '@/ui/primitives';
 import { layout, radius, space, useColors } from '@/ui/theme';
+import { useNow } from '@/ui/useNow';
 
 import { likeUser, startConversation } from '../discover/actions';
 
@@ -52,6 +54,7 @@ export function ProfileView({ uid, onBack }: { uid: string; onBack?: () => void 
   const [report, setReport] = useState(false);
   const [width, setWidth] = useState(0);
   const [page, setPage] = useState(0);
+  const now = useNow(60_000);
 
   if (res.error) return <Empty icon="person-outline" title={t('profile.unavailable')} body={toApiError(res.error).message} />;
   if (!res.data) return <Loading />;
@@ -118,6 +121,7 @@ export function ProfileView({ uid, onBack }: { uid: string; onBack?: () => void 
                 {p.badges.includes('phone') ? <Icon name="checkmark-circle" size="md" color={colors.scrimText} /> : null}
               </Row>
               <Row gap={space.xs} style={{ flexWrap: 'wrap' }}>
+                {isOnline(p.lastActiveAt, now) ? <Pill label={t('discover.online')} tone="online" /> : null}
                 <Pill label={t(`distance.${p.distance}`)} tone="onPhoto" icon="location-outline" />
                 {region ? <Pill label={region} tone="onPhoto" /> : null}
               </Row>

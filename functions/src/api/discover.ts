@@ -40,6 +40,7 @@ export function toCard(p: UserPublic, distance: DistanceBucket, likedByMe: boole
     badges: p.badges,
     distance,
     likedByMe,
+    lastActiveAt: p.lastActiveAt ?? null,
   };
 }
 

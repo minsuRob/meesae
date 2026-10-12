@@ -207,6 +207,3 @@ export const layout = {
   /** 프로필 사진 비율 */
   photoAspect: 4 / 5,
 } as const;
-
-/** 접속 중으로 치는 기준 (마지막 활동 후) */
-export const ONLINE_WINDOW_MS = 10 * 60 * 1000;

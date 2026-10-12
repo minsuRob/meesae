@@ -36,6 +36,8 @@ export interface ProfileCard {
   badges: Badge[];
   distance: DistanceBucket;
   likedByMe: boolean;
+  /** 마지막 활동 시각 (ms). 접속 중 표시는 shared/presence.ts 의 isOnline() 으로 */
+  lastActiveAt: number | null;
 }
 
 export interface Api {

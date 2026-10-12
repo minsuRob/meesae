@@ -221,6 +221,7 @@ export const ko = {
     anyone: '전체',
     ageRange: (p: { min: number; max: number }) => `${p.min}~${p.max}세`,
     verified: '인증',
+    online: '접속 중',
   },
 
   filters: {

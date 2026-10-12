@@ -11,9 +11,11 @@ export interface TextProps extends RNTextProps {
   /** 직접 색을 줄 때 (tone 보다 우선) */
   color?: string;
   center?: boolean;
+  /** 숫자 폭을 고정 (금액·시간처럼 줄맞춤이 필요한 곳) */
+  tabular?: boolean;
 }
 
-export function Text({ variant = 'body', tone, color, center, style, ...rest }: TextProps) {
+export function Text({ variant = 'body', tone, color, center, tabular, style, ...rest }: TextProps) {
   const colors = useColors();
   const t = tone ?? (variant === 'caption' ? 'muted' : 'default');
   const base =
@@ -31,7 +33,7 @@ export function Text({ variant = 'body', tone, color, center, style, ...rest }: 
   return (
     <RNText
       {...rest}
-      style={[{ fontFamily, color: color ?? base }, type[variant], center && { textAlign: 'center' }, style]}
+      style={[{ fontFamily, color: color ?? base }, type[variant], center && { textAlign: 'center' }, tabular && { fontVariant: ['tabular-nums'] }, style]}
     />
   );
 }

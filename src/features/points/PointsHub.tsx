@@ -113,7 +113,7 @@ export function PointsHub() {
         <Text variant="label" tone="muted">
           {t('points.balance')}
         </Text>
-        <Text variant="display" style={{ fontSize: 40, lineHeight: 48, marginTop: space.xs }}>
+        <Text variant="display" tabular style={{ fontSize: 40, lineHeight: 48, marginTop: space.xs }}>
           {t('common.points', { n: wallet.balance })}
         </Text>
         <Row gap={space.sm} style={{ marginTop: space.md, flexWrap: 'wrap' }}>
@@ -210,7 +210,7 @@ export function PointsHub() {
                 title={reasonLabel(e.reason, t)}
                 subtitle={formatDateTime(e.createdAt, tag)}
                 trailing={
-                  <Text variant="subtitle" color={e.delta > 0 ? colors.success : colors.text}>
+                  <Text variant="subtitle" tabular color={e.delta > 0 ? colors.success : colors.text}>
                     {e.delta > 0 ? '+' : '-'}
                     {t('common.points', { n: Math.abs(e.delta) })}
                   </Text>

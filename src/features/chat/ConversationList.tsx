@@ -1,6 +1,7 @@
 import { FlatList, View } from 'react-native';
 
 import { otherMember, peerLeft, type Conversation, type UserPublic } from '@shared/models';
+import { isOnline } from '@shared/presence';
 
 import { queries, refs } from '@/firebase/collections';
 import { useDoc, useQuery } from '@/firebase/hooks';
@@ -9,6 +10,7 @@ import { useT, type T } from '@/i18n';
 import { useUid } from '@/store/session';
 import { Avatar, Divider, Empty, Pill, Press, Row, SkeletonList, Stack, Text } from '@/ui/primitives';
 import { space, useColors } from '@/ui/theme';
+import { useNow } from '@/ui/useNow';
 
 export function useConversations() {
   const uid = useUid();
@@ -48,6 +50,8 @@ function ConversationRow({ c, me, selected, onPress }: { c: Conversation; me: st
   const avatar = useStorageUrl(peer?.photos[0]);
   const unread = c.unread?.[me] ?? 0;
   const deleted = peerLeft(c, me);
+  const now = useNow(60_000);
+  const online = !deleted && isOnline(peer?.lastActiveAt, now);
   const name = deleted ? t('chat.deletedUser') : (peer?.nickname ?? t('chat.unknownUser'));
   return (
     <Press
@@ -62,7 +66,7 @@ function ConversationRow({ c, me, selected, onPress }: { c: Conversation; me: st
       })}
     >
       <Row gap={space.md}>
-        <Avatar uri={avatar} name={peer?.nickname} size="lg" icon={deleted ? 'person-remove-outline' : undefined} verified={peer?.badges.includes('phone')} />
+        <Avatar uri={avatar} name={peer?.nickname} size="lg" icon={deleted ? 'person-remove-outline' : undefined} verified={!online && peer?.badges.includes('phone')} online={online} />
         <Stack gap={space.xxs} style={{ flex: 1 }}>
           <Row style={{ justifyContent: 'space-between' }}>
             <Row gap={space.xs} style={{ flex: 1 }}>
@@ -72,7 +76,7 @@ function ConversationRow({ c, me, selected, onPress }: { c: Conversation; me: st
               {c.kind === 'match' ? <Pill label={t('chat.badgeMatch')} tone="primary" /> : null}
               {c.closedBy ? <Pill label={t('chat.badgeClosed')} tone="neutral" /> : null}
             </Row>
-            <Text variant="caption" tone="faint">
+            <Text variant="caption" tone="faint" tabular>
               {c.lastMessage ? timeLabel(c.lastMessage.at, tag) : ''}
             </Text>
           </Row>
