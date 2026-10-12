@@ -12,9 +12,8 @@ import { LIMITS } from '@shared/validators';
 import { appFail, newRequestId } from './api';
 import { storage } from './config';
 
+/** 시스템 사진 선택기는 권한이 필요 없다 (iOS 에서 미리 물으면 '보관함 전체 접근' 창이 뜬다) */
 export async function pickImage(): Promise<ImagePicker.ImagePickerAsset | null> {
-  const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
-  if (!perm.granted) throw appFail('errors.photoPermission');
   const res = await ImagePicker.launchImageLibraryAsync({
     mediaTypes: ['images'],
     quality: 0.8,

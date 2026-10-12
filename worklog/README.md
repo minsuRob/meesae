@@ -58,7 +58,7 @@ meesae 작업 기록. **전부 읽지 말고, 아래 표에서 지금 필요한 
 - 로그인: Google 만 켜짐. Apple·휴대폰 미설정
 - 테스트: 단위 41 · Rules 22 · Functions 통합 16 · 실서버 스모크 18 전부 통과, 본인 구글 계정으로 실서버 웹 흐름 확인
 - Android: 릴리스 APK 빌드, 에뮬레이터에서 전 흐름 확인 ([06 › Android 네이티브](06-testing.md#android-네이티브)). 실서버 Google 로그인은 SHA-1 등록 전이라 안 됨
-- iOS: 시뮬레이터 Release 빌드·실행까지 (화면 흐름 미검증, 실기기 서명 팀 미정)
+- iOS: 시뮬레이터 Release 빌드, 전 흐름 확인 ([06 › iOS 네이티브](06-testing.md#ios-네이티브)). 실기기 서명 팀 미정
 - 아직: Android SHA-1 미등록, **App Check 강제 꺼짐** → [07 › P0](07-todo.md#p0-출시-차단)
 
 ## 이 폴더 고치는 법

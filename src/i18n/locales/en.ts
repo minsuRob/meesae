@@ -121,7 +121,6 @@ export const en: Catalog = {
     signInAgain: 'Please sign in again',
     network: 'Check your internet connection',
     unknown: 'Something went wrong. Please try again',
-    photoPermission: 'We need access to your photos. You can allow it in Settings',
     locationPermission: 'We need your location. You can allow it in Settings',
     locationUnavailable: "Couldn't find your location. Turn on location services and try again",
     uploadTooBig: 'That photo is too large (max 5MB)',
