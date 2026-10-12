@@ -5,7 +5,6 @@
 
 import { getLocales } from 'expo-localization';
 import { useEffect, useState } from 'react';
-import { Pressable, View } from 'react-native';
 
 import { COUNTRIES, countryFromLocale } from '@shared/countries';
 import {
@@ -22,8 +21,8 @@ import { toApiError } from '@/firebase/api';
 import { pickImage, uploadImage, useStorageUrl } from '@/firebase/storage';
 import { countryName, issueMessage, regionName, useT } from '@/i18n';
 import { useUid } from '@/store/session';
-import { Button, Chip, ErrorText, Input, Photo, Row, Stack, Text } from '@/ui/primitives';
-import { radius, space, useColors } from '@/ui/theme';
+import { Button, Chip, ErrorText, Icon, Input, PhotoTile, Row, Stack, Text } from '@/ui/primitives';
+import { layout, space, useColors } from '@/ui/theme';
 
 import { verifyLocation } from '../location/current';
 import { useDraft } from './draft';
@@ -84,27 +83,10 @@ export function BasicStep({ draft, update, errors }: StepProps) {
   );
 }
 
-function PhotoTile({ path, onRemove }: { path: string; onRemove: () => void }) {
-  const colors = useColors();
+function Tile({ path, onRemove }: { path: string; onRemove: () => void }) {
   const { t } = useT();
   const url = useStorageUrl(path);
-  return (
-    <Pressable onPress={onRemove} style={{ width: '31%' }} accessibilityLabel={t('onboarding.removePhoto')}>
-      <Photo source={url ? { uri: url } : undefined} />
-      <View
-        style={{
-          position: 'absolute',
-          top: 6,
-          right: 6,
-          backgroundColor: colors.overlay,
-          borderRadius: radius.pill,
-          paddingHorizontal: 8,
-        }}
-      >
-        <Text color={colors.textInverse}>×</Text>
-      </View>
-    </Pressable>
-  );
+  return <PhotoTile uri={url} onRemove={onRemove} removeLabel={t('onboarding.removePhoto')} aspect={layout.photoAspect} />;
 }
 
 export function PhotosStep({ draft, update, errors }: StepProps) {
@@ -136,11 +118,11 @@ export function PhotosStep({ draft, update, errors }: StepProps) {
       <Text variant="caption">{t('onboarding.photosHint', { max: LIMITS.PROFILE_PHOTOS_MAX })}</Text>
       <Row style={{ flexWrap: 'wrap' }} gap={space.sm}>
         {photos.map((p) => (
-          <PhotoTile key={p} path={p} onRemove={() => update({ photos: photos.filter((x) => x !== p) })} />
+          <Tile key={p} path={p} onRemove={() => update({ photos: photos.filter((x) => x !== p) })} />
         ))}
       </Row>
       {photos.length < LIMITS.PROFILE_PHOTOS_MAX ? (
-        <Button title={t('onboarding.addPhoto')} kind="secondary" onPress={add} loading={busy} />
+        <Button title={t('onboarding.addPhoto')} kind="secondary" icon={<Icon name="camera-outline" size="md" />} onPress={add} loading={busy} style={{ alignSelf: 'flex-start' }} />
       ) : null}
       <ErrorText>{error ?? msg(errors.photos)}</ErrorText>
     </Stack>
@@ -151,7 +133,7 @@ export function MbtiStep({ draft, update }: StepProps) {
   return (
     <Row style={{ flexWrap: 'wrap' }}>
       {MBTIS.map((m) => (
-        <Chip key={m} label={m} selected={draft.mbti === m} onPress={() => update({ mbti: draft.mbti === m ? null : m })} />
+        <Chip key={m} label={m} small selected={draft.mbti === m} onPress={() => update({ mbti: draft.mbti === m ? null : m })} />
       ))}
     </Row>
   );
@@ -237,7 +219,12 @@ export function LocationStep() {
   return (
     <Stack gap={space.lg}>
       <Text variant="caption">{t('onboarding.locationHint')}</Text>
-      {label ? <Text variant="heading">📍 {label}</Text> : null}
+      {label ? (
+        <Row gap={space.sm}>
+          <Icon name="location" size="lg" />
+          <Text variant="heading">{label}</Text>
+        </Row>
+      ) : null}
       <Button title={label ? t('onboarding.locationVerifyAgain') : t('onboarding.locationVerify')} onPress={verify} loading={busy} />
       {message ? <Text color={colors.success}>{message}</Text> : null}
       <ErrorText>{error}</ErrorText>

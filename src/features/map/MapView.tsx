@@ -17,7 +17,7 @@ import {
 import { useEffect, useRef } from 'react';
 import { View } from 'react-native';
 
-import { useColors, useScheme, type Colors } from '@/ui/theme';
+import { fontFamily, layout, useColors, useScheme, type Colors } from '@/ui/theme';
 
 import { markerSize, type MapMarker, type MapViewProps } from './types';
 import { useMapStyle, type MapStyle } from './useMapStyle';
@@ -51,9 +51,9 @@ function drawMarkers(
       border: `2px solid ${colors.surface}`,
       background: m.highlight ? colors.primary : `${colors.accent}CC`,
       color: colors.textInverse,
-      font: '700 12px system-ui, sans-serif',
+      font: `700 12px ${fontFamily}`,
       cursor: 'pointer',
-      boxShadow: '0 1px 4px rgba(0,0,0,.25)',
+      boxShadow: '0 2px 6px rgba(0,0,0,.18)',
     });
     dot.addEventListener('click', () => onPress(m.id));
     return new Marker({ element: dot }).setLngLat([m.lng, m.lat]).addTo(map);
@@ -117,5 +117,5 @@ export function MapView({ center, zoom, markers, onMarkerPress }: MapViewProps) 
     markerRefs.current = drawMarkers(map, markers, colors, press);
   }, [markers, colors]);
 
-  return <View ref={ref} style={{ flex: 1, minHeight: 300, backgroundColor: colors.bg }} />;
+  return <View ref={ref} style={{ flex: 1, minHeight: layout.mapMinHeight, backgroundColor: colors.bg }} />;
 }

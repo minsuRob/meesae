@@ -6,16 +6,21 @@
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
+import * as SystemUI from 'expo-system-ui';
 import { useEffect, useMemo } from 'react';
 import { Platform, View } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { useLocale } from '@/i18n';
 import { startSessionListener, useSession } from '@/store/session';
+import { loadFonts } from '@/ui/fonts';
 import { KeyboardRoot } from '@/ui/keyboard';
-import { useColors, useScheme } from '@/ui/theme';
+import { ToastHost } from '@/ui/primitives';
+import { fontFamily, useColors, useScheme } from '@/ui/theme';
 
 SplashScreen.preventAutoHideAsync().catch(() => undefined);
+loadFonts();
 
 export default function RootLayout() {
   const status = useSession((s) => s.status);
@@ -32,12 +37,19 @@ export default function RootLayout() {
     if (status !== 'loading') SplashScreen.hideAsync().catch(() => undefined);
   }, [status]);
 
-  // 웹: 스크린리더·번역기가 쓰는 lang, 스크롤 끝에 비치는 배경색
+  // 네이티브 루트 배경 (화면 전환 사이·키보드 뒤에 비치는 색)
+  useEffect(() => {
+    if (Platform.OS === 'web') return;
+    SystemUI.setBackgroundColorAsync(colors.bg).catch(() => undefined);
+  }, [colors.bg]);
+
+  // 웹: 스크린리더·번역기가 쓰는 lang, 스크롤 끝에 비치는 배경색, 기본 글꼴
   useEffect(() => {
     if (Platform.OS !== 'web') return;
     document.documentElement.lang = locale;
     document.documentElement.style.colorScheme = scheme;
     document.body.style.backgroundColor = colors.bg;
+    document.body.style.fontFamily = fontFamily;
   }, [locale, scheme, colors.bg]);
 
   const navTheme = useMemo(() => {
@@ -50,7 +62,7 @@ export default function RootLayout() {
         background: colors.bg,
         card: colors.surface,
         text: colors.text,
-        border: colors.border,
+        border: colors.hairline,
       },
     };
   }, [scheme, colors]);
@@ -62,24 +74,27 @@ export default function RootLayout() {
   const onboarded = signedIn && claims.onboarded === true;
 
   return (
-    <ThemeProvider value={navTheme}>
-      <SafeAreaProvider style={{ backgroundColor: colors.bg }}>
-        <KeyboardRoot>
-          <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
-          <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}>
-            <Stack.Screen name="index" />
-            <Stack.Protected guard={!signedIn}>
-              <Stack.Screen name="(auth)" />
-            </Stack.Protected>
-            <Stack.Protected guard={signedIn && !onboarded}>
-              <Stack.Screen name="onboarding" />
-            </Stack.Protected>
-            <Stack.Protected guard={onboarded}>
-              <Stack.Screen name="(main)" />
-            </Stack.Protected>
-          </Stack>
-        </KeyboardRoot>
-      </SafeAreaProvider>
-    </ThemeProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ThemeProvider value={navTheme}>
+        <SafeAreaProvider style={{ backgroundColor: colors.bg }}>
+          <KeyboardRoot>
+            <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
+            <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}>
+              <Stack.Screen name="index" />
+              <Stack.Protected guard={!signedIn}>
+                <Stack.Screen name="(auth)" />
+              </Stack.Protected>
+              <Stack.Protected guard={signedIn && !onboarded}>
+                <Stack.Screen name="onboarding" />
+              </Stack.Protected>
+              <Stack.Protected guard={onboarded}>
+                <Stack.Screen name="(main)" />
+              </Stack.Protected>
+            </Stack>
+            <ToastHost />
+          </KeyboardRoot>
+        </SafeAreaProvider>
+      </ThemeProvider>
+    </GestureHandlerRootView>
   );
 }

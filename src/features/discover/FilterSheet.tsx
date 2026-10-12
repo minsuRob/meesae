@@ -6,7 +6,7 @@ import { DRINKING, GENDERS, MBTIS, SMOKING } from '@shared/onboarding-schema';
 import { useT } from '@/i18n';
 import { useWallet } from '@/store/wallet';
 import { Button, Chip, Input, Row, Sheet, Stack, Text } from '@/ui/primitives';
-import { space, useColors } from '@/ui/theme';
+import { space } from '@/ui/theme';
 import { useNow } from '@/ui/useNow';
 
 function toggle<T>(list: T[] | undefined, v: T): T[] {
@@ -14,6 +14,15 @@ function toggle<T>(list: T[] | undefined, v: T): T[] {
   if (s.has(v)) s.delete(v);
   else s.add(v);
   return [...s];
+}
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <Stack gap={space.sm}>
+      <Text variant="subtitle">{title}</Text>
+      {children}
+    </Stack>
+  );
 }
 
 /** 열 때마다 부모가 key 를 바꿔 새로 만든다 → value 로 초기화된다 */
@@ -28,7 +37,6 @@ export function FilterSheet({
   onClose: () => void;
   onApply: (f: DiscoverFilters) => void;
 }) {
-  const colors = useColors();
   const { t } = useT();
   const [f, setF] = useState<DiscoverFilters>(value);
   const now = useNow();
@@ -41,19 +49,32 @@ export function FilterSheet({
   ] as const;
 
   return (
-    <Sheet visible={visible} onClose={onClose} title={t('filters.title')}>
-      <Stack gap={space.lg}>
-        <Stack gap={space.sm}>
-          <Text variant="label">{t('filters.scope')}</Text>
+    <Sheet
+      visible={visible}
+      onClose={onClose}
+      title={t('filters.title')}
+      closeLabel={t('common.close')}
+      footer={
+        <Row gap={space.md}>
+          <Button title={t('filters.reset')} kind="ghost" onPress={() => setF({ scope: 'country' })} />
+          <Button
+            title={t('filters.apply')}
+            style={{ flex: 1 }}
+            onPress={() => onApply(extra ? f : { ...f, mbti: undefined, drinking: undefined, smoking: undefined })}
+          />
+        </Row>
+      }
+    >
+      <Stack gap={space.xl} style={{ paddingVertical: space.sm }}>
+        <Section title={t('filters.scope')}>
           <Row style={{ flexWrap: 'wrap' }}>
             {scopes.map(([v, label]) => (
               <Chip key={v} label={label} selected={(f.scope ?? 'country') === v} onPress={() => setF({ ...f, scope: v })} />
             ))}
           </Row>
-        </Stack>
-        <Stack gap={space.sm}>
-          <Text variant="label">{t('filters.gender')}</Text>
-          <Row>
+        </Section>
+        <Section title={t('filters.gender')}>
+          <Row style={{ flexWrap: 'wrap' }}>
             {GENDERS.map((g) => (
               <Chip
                 key={g}
@@ -63,31 +84,34 @@ export function FilterSheet({
               />
             ))}
           </Row>
-        </Stack>
-        <Row gap={space.md}>
-          <Input
-            label={t('filters.minAge')}
-            keyboardType="number-pad"
-            value={f.ageMin?.toString() ?? ''}
-            onChangeText={(v) => setF({ ...f, ageMin: v ? Number(v.replace(/\D/g, '')) : undefined })}
-            style={{ minWidth: 100 }}
-          />
-          <Input
-            label={t('filters.maxAge')}
-            keyboardType="number-pad"
-            value={f.ageMax?.toString() ?? ''}
-            onChangeText={(v) => setF({ ...f, ageMax: v ? Number(v.replace(/\D/g, '')) : undefined })}
-            style={{ minWidth: 100 }}
-          />
+        </Section>
+        <Row gap={space.md} style={{ alignItems: 'flex-start' }}>
+          <Stack style={{ flex: 1 }}>
+            <Input
+              label={t('filters.minAge')}
+              keyboardType="number-pad"
+              inputMode="numeric"
+              value={f.ageMin?.toString() ?? ''}
+              onChangeText={(v) => setF({ ...f, ageMin: v ? Number(v.replace(/\D/g, '')) : undefined })}
+            />
+          </Stack>
+          <Stack style={{ flex: 1 }}>
+            <Input
+              label={t('filters.maxAge')}
+              keyboardType="number-pad"
+              inputMode="numeric"
+              value={f.ageMax?.toString() ?? ''}
+              onChangeText={(v) => setF({ ...f, ageMax: v ? Number(v.replace(/\D/g, '')) : undefined })}
+            />
+          </Stack>
         </Row>
 
-        <Stack gap={space.sm}>
-          <Text variant="label">{extra ? t('filters.extra') : t('filters.extraLocked')}</Text>
+        <Section title={extra ? t('filters.extra') : t('filters.extraLocked')}>
           {extra ? (
-            <>
+            <Stack gap={space.sm}>
               <Row style={{ flexWrap: 'wrap' }}>
                 {MBTIS.map((m) => (
-                  <Chip key={m} label={m} selected={f.mbti?.includes(m)} onPress={() => setF({ ...f, mbti: toggle(f.mbti, m) })} />
+                  <Chip key={m} label={m} small selected={f.mbti?.includes(m)} onPress={() => setF({ ...f, mbti: toggle(f.mbti, m) })} />
                 ))}
               </Row>
               <Row style={{ flexWrap: 'wrap' }}>
@@ -110,22 +134,13 @@ export function FilterSheet({
                   />
                 ))}
               </Row>
-            </>
+            </Stack>
           ) : (
-            <Text variant="caption" color={colors.textMuted}>
+            <Text variant="bodySm" tone="muted">
               {t('filters.extraHint')}
             </Text>
           )}
-        </Stack>
-
-        <Row gap={space.md}>
-          <Button title={t('filters.reset')} kind="ghost" onPress={() => setF({ scope: 'country' })} />
-          <Button
-            title={t('filters.apply')}
-            style={{ flex: 1 }}
-            onPress={() => onApply(extra ? f : { ...f, mbti: undefined, drinking: undefined, smoking: undefined })}
-          />
-        </Row>
+        </Section>
       </Stack>
     </Sheet>
   );

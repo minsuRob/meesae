@@ -4,10 +4,10 @@ import { Platform, View } from 'react-native';
 import { toApiError } from '@/firebase/api';
 import { DEV_LOGIN_ENABLED, devSignIn } from '@/firebase/auth/dev-login';
 import { isAppleSignInAvailable, signInWithApple, signInWithGoogle } from '@/firebase/auth/social';
-import { LanguagePicker } from '@/features/settings/Preferences';
+import { LanguageSegmented } from '@/features/settings/Preferences';
 import { useT } from '@/i18n';
 import { useSession } from '@/store/session';
-import { Button, Card, Divider, ErrorText, Input, Screen, Stack, Text } from '@/ui/primitives';
+import { Button, Card, ErrorText, Icon, Input, Screen, Stack, Text } from '@/ui/primitives';
 import { space, useColors } from '@/ui/theme';
 
 export default function SignIn() {
@@ -39,49 +39,72 @@ export default function SignIn() {
   }
 
   return (
-    <Screen narrow style={{ justifyContent: 'center' }}>
-      <Stack gap={space.xl}>
-        <View style={{ alignSelf: 'flex-end', width: 200 }}>
-          <LanguagePicker withSystem={false} />
+    <Screen narrow edges={['top', 'bottom']}>
+      <View style={{ alignItems: 'flex-end' }}>
+        <View style={{ minWidth: 160 }}>
+          <LanguageSegmented />
         </View>
-        <Stack gap={space.sm}>
-          <Text variant="title" color={colors.primary}>
-            meesae
-          </Text>
-          <Text variant="caption">{t('auth.tagline')}</Text>
-        </Stack>
+      </View>
+      <View style={{ flex: 1, justifyContent: 'center' }}>
+        <Stack gap={space.xxl}>
+          <Stack gap={space.sm}>
+            <Text variant="display" color={colors.primary} style={{ fontSize: 40, lineHeight: 48, fontWeight: '800', letterSpacing: -1.2 }}>
+              meesae
+            </Text>
+            <Text variant="heading" tone="body" style={{ fontWeight: '400' }}>
+              {t('auth.tagline')}
+            </Text>
+          </Stack>
 
-        {status === 'signedIn' && claims.banned ? <ErrorText>{t('auth.banned')}</ErrorText> : null}
+          {status === 'signedIn' && claims.banned ? <ErrorText>{t('auth.banned')}</ErrorText> : null}
 
-        <Stack gap={space.md}>
-          <Button title={t('auth.google')} kind="secondary" loading={busy === 'google'} onPress={() => run('google', signInWithGoogle)} />
-          {apple ? (
-            <Button title={t('auth.apple')} kind="secondary" loading={busy === 'apple'} onPress={() => run('apple', signInWithApple)} />
-          ) : null}
-          {Platform.OS === 'android' ? <Text variant="caption">{t('auth.appleIosOnly')}</Text> : null}
-        </Stack>
-
-        {DEV_LOGIN_ENABLED ? (
-          <Card style={{ backgroundColor: colors.bgMuted }}>
-            <Stack gap={space.md}>
-              <Text variant="label">{t('auth.devTitle')}</Text>
-              <Input value={devName} onChangeText={setDevName} autoCapitalize="none" placeholder={t('auth.devPlaceholder')} />
+          <Stack gap={space.md}>
+            <Button
+              title={t('auth.google')}
+              kind="secondary"
+              icon={<Icon name="logo-google" size="md" />}
+              loading={busy === 'google'}
+              onPress={() => run('google', signInWithGoogle)}
+            />
+            {apple ? (
               <Button
-                title={t('auth.devSignInAs', { name: devName || 'tester' })}
-                small
-                loading={busy === 'dev'}
-                onPress={() => run('dev', () => devSignIn(devName))}
+                title={t('auth.apple')}
+                kind="secondary"
+                icon={<Icon name="logo-apple" size="md" />}
+                loading={busy === 'apple'}
+                onPress={() => run('apple', signInWithApple)}
               />
-            </Stack>
-          </Card>
-        ) : null}
+            ) : null}
+            {Platform.OS === 'android' ? (
+              <Text variant="caption" center>
+                {t('auth.appleIosOnly')}
+              </Text>
+            ) : null}
+          </Stack>
 
-        <Divider />
-        <ErrorText>{error}</ErrorText>
-        <Text variant="caption" center>
-          {t('auth.terms')}
-        </Text>
-      </Stack>
+          {DEV_LOGIN_ENABLED ? (
+            <Card style={{ backgroundColor: colors.bgMuted, borderColor: colors.hairline }}>
+              <Stack gap={space.md}>
+                <Text variant="label" tone="muted">
+                  {t('auth.devTitle')}
+                </Text>
+                <Input value={devName} onChangeText={setDevName} autoCapitalize="none" placeholder={t('auth.devPlaceholder')} />
+                <Button
+                  title={t('auth.devSignInAs', { name: devName || 'tester' })}
+                  small
+                  loading={busy === 'dev'}
+                  onPress={() => run('dev', () => devSignIn(devName))}
+                />
+              </Stack>
+            </Card>
+          ) : null}
+
+          <ErrorText>{error}</ErrorText>
+        </Stack>
+      </View>
+      <Text variant="caption" tone="faint" center>
+        {t('auth.terms')}
+      </Text>
     </Screen>
   );
 }

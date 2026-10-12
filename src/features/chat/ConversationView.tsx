@@ -1,11 +1,12 @@
 /**
  * 대화방. 최근 N 건을 실시간 구독하고, 위로 스크롤하면 N 을 늘린다.
  * 보내기는 전부 Functions 로 (sendMessage / finalizeChatImage).
+ * 같은 사람이 3분 안에 이어 보낸 말풍선은 붙여 그리고, 날짜가 바뀌는 자리에 날짜 알약을 끼운다.
  */
 
 import { router } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { FlatList, Pressable, TextInput, View } from 'react-native';
+import { FlatList, TextInput, View } from 'react-native';
 
 import { REPORT_REASONS, type ReportReason } from '@shared/api';
 import { otherMember, peerLeft, type Message, type UserPublic } from '@shared/models';
@@ -16,21 +17,50 @@ import { call, newRequestId, toApiError } from '@/firebase/api';
 import { queries, refs } from '@/firebase/collections';
 import { useDoc, useQuery } from '@/firebase/hooks';
 import { pickImage, uploadImage, useStorageUrl } from '@/firebase/storage';
-import { regionName, useT } from '@/i18n';
+import { regionName, useT, type T } from '@/i18n';
 import { useClaims, useUid } from '@/store/session';
 import { useWallet } from '@/store/wallet';
 import { KeyboardAvoid } from '@/ui/keyboard';
 import { confirm, notify } from '@/ui/notify';
-import { Avatar, Button, Chip, Empty, Icon, Loading, Photo, Row, Sheet, Stack, Text } from '@/ui/primitives';
-import { font, radius, space, useColors, useScheme } from '@/ui/theme';
+import { Avatar, Chip, Empty, HeaderBar, IconButton, ListGroup, ListRow, Loading, Photo, Pill, Press, Row, Sheet, Stack, Text } from '@/ui/primitives';
+import { control, fontFamily, layout, radius, space, type, useColors, useScheme } from '@/ui/theme';
 import { useNow } from '@/ui/useNow';
 
 import { currentCoords } from '../location/current';
 
 const PAGE = 30;
 const SHARE_MINUTES = [15, 30, 60] as const;
+const GROUP_WINDOW_MS = 3 * 60 * 1000;
 
-function Bubble({ m, mine, read }: { m: Message; mine: boolean; read: boolean }) {
+type RowItem = { kind: 'msg'; m: Message; grouped: boolean } | { kind: 'day'; key: string; at: number };
+
+function dayOf(ms: number): string {
+  return new Date(ms).toDateString();
+}
+
+function dayLabel(ms: number, now: number, tag: string, t: T): string {
+  const d = dayOf(ms);
+  if (d === dayOf(now)) return t('chat.today');
+  if (d === dayOf(now - 86_400_000)) return t('chat.yesterday');
+  return new Date(ms).toLocaleDateString(tag, { month: 'long', day: 'numeric' });
+}
+
+/** 역순 목록(최신이 0번)에 묶음·날짜 정보를 붙인다 */
+function buildRows(msgs: Message[]): RowItem[] {
+  const rows: RowItem[] = [];
+  for (let i = 0; i < msgs.length; i++) {
+    const m = msgs[i]!;
+    const older = msgs[i + 1];
+    const grouped = Boolean(
+      older && older.type !== 'system' && m.type !== 'system' && older.senderUid === m.senderUid && m.createdAt - older.createdAt < GROUP_WINDOW_MS && dayOf(older.createdAt) === dayOf(m.createdAt),
+    );
+    rows.push({ kind: 'msg', m, grouped });
+    if (!older || dayOf(older.createdAt) !== dayOf(m.createdAt)) rows.push({ kind: 'day', key: `day:${m.id}`, at: m.createdAt });
+  }
+  return rows;
+}
+
+function Bubble({ m, mine, read, grouped }: { m: Message; mine: boolean; read: boolean; grouped: boolean }) {
   const colors = useColors();
   const { t } = useT();
   const img = useStorageUrl(m.type === 'image' ? m.imagePath : null);
@@ -41,25 +71,35 @@ function Bubble({ m, mine, read }: { m: Message; mine: boolean; read: boolean })
       </Text>
     );
   }
+  const tail = radius.sm;
+  const big = 20;
   return (
-    <View style={{ alignItems: mine ? 'flex-end' : 'flex-start', marginVertical: 2 }}>
+    <View style={{ alignItems: mine ? 'flex-end' : 'flex-start', marginTop: grouped ? space.xxs : space.sm }}>
       <View
         style={{
           maxWidth: '78%',
-          borderRadius: radius.lg,
-          padding: m.type === 'image' ? 4 : space.md,
-          backgroundColor: mine ? colors.primary : colors.bgMuted,
+          borderRadius: big,
+          borderBottomRightRadius: mine ? tail : big,
+          borderBottomLeftRadius: mine ? big : tail,
+          padding: m.type === 'image' ? space.xs : undefined,
+          paddingHorizontal: m.type === 'image' ? space.xs : space.lg,
+          paddingVertical: m.type === 'image' ? space.xs : space.md,
+          backgroundColor: mine ? colors.bubbleMine : colors.bubbleTheirs,
         }}
       >
         {m.type === 'image' ? (
-          <View style={{ width: 200 }}>
-            <Photo source={img ? { uri: img } : undefined} aspect={1} />
+          <View style={{ width: layout.bubbleImageWidth }}>
+            <Photo source={img ? { uri: img } : undefined} aspect={1} style={{ borderRadius: big - space.xs }} />
           </View>
         ) : (
-          <Text color={mine ? colors.textInverse : colors.text}>{m.text}</Text>
+          <Text color={mine ? colors.onBubbleMine : colors.text}>{m.text}</Text>
         )}
       </View>
-      {mine && read ? <Text variant="caption">{t('chat.read')}</Text> : null}
+      {mine && read ? (
+        <Text variant="caption" tone="faint">
+          {t('chat.read')}
+        </Text>
+      ) : null}
     </View>
   );
 }
@@ -67,7 +107,7 @@ function Bubble({ m, mine, read }: { m: Message; mine: boolean; read: boolean })
 export function ConversationView({ id, embedded }: { id: string; embedded?: boolean }) {
   const colors = useColors();
   const scheme = useScheme();
-  const { t, locale } = useT();
+  const { t, locale, tag } = useT();
   const me = useUid();
   const claims = useClaims();
   const conv = useDoc(refs.conversation(id));
@@ -94,13 +134,15 @@ export function ConversationView({ id, embedded }: { id: string; embedded?: bool
 
   const peerReadAt = peerUid ? (conv.data?.readAt?.[peerUid] ?? 0) : 0;
   const lastMineId = useMemo(() => msgs.data.find((m) => m.senderUid === me)?.id, [msgs.data, me]);
+  const rows = useMemo(() => buildRows(msgs.data), [msgs.data]);
 
   if (conv.loading) return <Loading />;
-  if (!conv.data || !me) return <Empty title={t('chat.notFound')} />;
+  if (!conv.data || !me) return <Empty icon="chatbubble-outline" title={t('chat.notFound')} />;
   const closed = Boolean(conv.data.closedBy);
   const deleted = peerLeft(conv.data, me);
   const canImage = can(claims, 'chat.sendImage');
   const canShare = can(claims, 'location.liveShare');
+  const peerName = deleted ? t('chat.deletedUser') : (peer?.nickname ?? t('chat.unknownUser'));
 
   async function send() {
     const body = text.trim();
@@ -171,125 +213,156 @@ export function ConversationView({ id, embedded }: { id: string; embedded?: bool
     }
   }
 
+  const canSend = Boolean(text.trim()) && !sending;
+
   return (
     <KeyboardAvoid style={{ flex: 1, backgroundColor: colors.bg }}>
-      <Row style={{ padding: space.md, borderBottomWidth: 1, borderBottomColor: colors.border, justifyContent: 'space-between' }}>
-        <Row gap={space.md}>
-          {!embedded ? (
-            <Pressable onPress={() => router.back()} accessibilityLabel={t('common.back')}>
-              <Icon name="chevron-back" />
-            </Pressable>
-          ) : null}
-          <Pressable
+      <HeaderBar
+        onBack={embedded ? undefined : () => router.back()}
+        backLabel={t('common.back')}
+        left={
+          <Press
             disabled={deleted}
+            haptic={false}
+            pressScale={1}
             onPress={() => peerUid && router.push({ pathname: '/profile/[uid]', params: { uid: peerUid } })}
-            style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}
+            style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}
           >
-            <Avatar uri={peerAvatar} name={peer?.nickname} size={36} icon={deleted ? 'person-remove-outline' : undefined} />
+            <Avatar uri={peerAvatar} name={peer?.nickname} size="sm" icon={deleted ? 'person-remove-outline' : undefined} />
             <Stack gap={0}>
-              <Text variant="label" color={deleted ? colors.textMuted : undefined}>
-                {deleted ? t('chat.deletedUser') : (peer?.nickname ?? t('chat.unknownUser'))}
+              <Text variant="subtitle" tone={deleted ? 'muted' : 'default'}>
+                {peerName}
               </Text>
               <Text variant="caption">{(peer && regionName(peer.regionLabels, peer.regionLabel, locale)) ?? ''}</Text>
             </Stack>
-          </Pressable>
-        </Row>
-        <Pressable onPress={() => setMenu(true)} accessibilityLabel={t('chat.menu')}>
-          <Icon name="ellipsis-horizontal" />
-        </Pressable>
-      </Row>
+          </Press>
+        }
+        right={<IconButton name="ellipsis-horizontal" label={t('chat.menu')} variant="ghost" onPress={() => setMenu(true)} />}
+      />
 
       <FlatList
         inverted
-        data={msgs.data}
-        keyExtractor={(m) => m.id}
-        contentContainerStyle={{ padding: space.md }}
+        data={rows}
+        keyExtractor={(r) => (r.kind === 'day' ? r.key : r.m.id)}
+        contentContainerStyle={{ paddingHorizontal: space.lg, paddingVertical: space.md }}
         onEndReached={() => {
           if (msgs.data.length >= limitN) setLimitN((n) => n + PAGE);
         }}
         onEndReachedThreshold={0.3}
-        renderItem={({ item }) => (
-          <Bubble m={item} mine={item.senderUid === me} read={readReceipt && item.id === lastMineId && peerReadAt >= item.createdAt} />
-        )}
+        renderItem={({ item }) =>
+          item.kind === 'day' ? (
+            <View style={{ alignItems: 'center', marginVertical: space.lg }}>
+              <Pill label={dayLabel(item.at, now, tag, t)} tone="neutral" />
+            </View>
+          ) : (
+            <Bubble
+              m={item.m}
+              mine={item.m.senderUid === me}
+              grouped={item.grouped}
+              read={readReceipt && item.m.id === lastMineId && peerReadAt >= item.m.createdAt}
+            />
+          )
+        }
         ListEmptyComponent={
-          <Text variant="caption" center style={{ padding: space.xl }}>
+          <Text variant="bodySm" tone="muted" center style={{ padding: space.xl }}>
             {conv.data.kind === 'intro' ? t('chat.helloIntro') : t('chat.helloMatch')}
           </Text>
         }
       />
 
       {closed ? (
-        <Text variant="caption" center style={{ padding: space.lg }}>
+        <Text variant="bodySm" tone="muted" center style={{ padding: space.lg }}>
           {deleted ? t('chat.closedDeleted') : t('chat.closed')}
         </Text>
       ) : (
-        <Row style={{ padding: space.sm, borderTopWidth: 1, borderTopColor: colors.border }} gap={space.sm}>
-          <Pressable onPress={sendImage} accessibilityLabel={t('chat.sendPhoto')} style={{ padding: space.sm }}>
-            <Icon name={canImage ? 'image-outline' : 'lock-closed-outline'} color={colors.textMuted} />
-          </Pressable>
-          <TextInput
-            ref={inputRef}
-            value={text}
-            onChangeText={setText}
-            placeholder={t('chat.placeholder')}
-            placeholderTextColor={colors.textMuted}
-            keyboardAppearance={scheme}
-            maxLength={LIMITS.MESSAGE_MAX}
-            multiline
-            onSubmitEditing={send}
+        <Row
+          gap={space.sm}
+          style={{
+            paddingHorizontal: space.md,
+            paddingVertical: space.sm,
+            borderTopWidth: 1,
+            borderTopColor: colors.hairline,
+            backgroundColor: colors.surface,
+            alignItems: 'flex-end',
+          }}
+        >
+          <IconButton
+            name={canImage ? 'image-outline' : 'lock-closed-outline'}
+            label={t('chat.sendPhoto')}
+            variant="ghost"
+            onPress={sendImage}
+            color={colors.textMuted}
+          />
+          <View
             style={{
               flex: 1,
-              maxHeight: 120,
-              paddingHorizontal: space.md,
-              paddingVertical: space.sm,
-              borderRadius: radius.lg,
-              backgroundColor: colors.bgMuted,
-              fontSize: font.size.md,
-              color: colors.text,
+              minHeight: control.buttonSm,
+              maxHeight: layout.chatInputMaxHeight,
+              borderWidth: 1,
+              borderColor: colors.border,
+              borderRadius: radius.pill,
+              paddingHorizontal: space.lg,
+              justifyContent: 'center',
             }}
-          />
-          <Button title={t('chat.send')} small onPress={send} loading={sending} disabled={!text.trim()} />
+          >
+            <TextInput
+              ref={inputRef}
+              value={text}
+              onChangeText={setText}
+              placeholder={t('chat.placeholder')}
+              placeholderTextColor={colors.textFaint}
+              keyboardAppearance={scheme}
+              maxLength={LIMITS.MESSAGE_MAX}
+              multiline
+              onSubmitEditing={send}
+              style={{ fontFamily, fontSize: type.body.fontSize, color: colors.text, paddingVertical: space.sm, maxHeight: layout.chatInputMaxHeight - space.sm }}
+            />
+          </View>
+          <IconButton name="arrow-up" label={t('chat.send')} variant="filled" onPress={send} disabled={!canSend} />
         </Row>
       )}
 
-      <Sheet visible={menu} onClose={() => setMenu(false)} title={t('chat.menuTitle')}>
-        <Stack gap={space.md}>
-          <Text variant="label">{canShare ? t('chat.liveShare') : t('chat.liveShareLocked')}</Text>
-          {canShare ? (
-            <Row>
-              {SHARE_MINUTES.map((n) => (
-                <Chip key={n} label={t('chat.minutes', { n })} onPress={() => shareLocation(n)} />
-              ))}
-            </Row>
-          ) : (
-            <Button
-              title={t('chat.verifyPhone')}
-              kind="secondary"
-              small
+      <Sheet visible={menu} onClose={() => setMenu(false)} title={t('chat.menuTitle')} closeLabel={t('common.close')}>
+        <Stack gap={space.lg}>
+          <Stack gap={space.sm}>
+            <Text variant="subtitle">{canShare ? t('chat.liveShare') : t('chat.liveShareLocked')}</Text>
+            {canShare ? (
+              <Row>
+                {SHARE_MINUTES.map((n) => (
+                  <Chip key={n} label={t('chat.minutes', { n })} onPress={() => shareLocation(n)} />
+                ))}
+              </Row>
+            ) : (
+              <ListRow
+                icon="lock-closed-outline"
+                title={t('chat.verifyPhone')}
+                onPress={() => {
+                  setMenu(false);
+                  router.push('/profile/phone-verify');
+                }}
+              />
+            )}
+          </Stack>
+          <ListGroup>
+            <ListRow
+              icon="flag-outline"
+              title={t('chat.report')}
               onPress={() => {
                 setMenu(false);
-                router.push('/profile/phone-verify');
+                setReport(true);
               }}
             />
-          )}
-          <Button
-            title={t('chat.report')}
-            kind="secondary"
-            onPress={() => {
-              setMenu(false);
-              setReport(true);
-            }}
-          />
-          <Button title={t('chat.block')} kind="danger" onPress={block} />
+            <ListRow icon="ban-outline" title={t('chat.block')} destructive onPress={block} />
+          </ListGroup>
         </Stack>
       </Sheet>
 
-      <Sheet visible={report} onClose={() => setReport(false)} title={t('chat.reportTitle')}>
-        <Stack gap={space.sm}>
+      <Sheet visible={report} onClose={() => setReport(false)} title={t('chat.reportTitle')} closeLabel={t('common.close')}>
+        <ListGroup>
           {REPORT_REASONS.map((r) => (
-            <Button key={r} title={t(`reportReasons.${r}`)} kind="secondary" onPress={() => sendReport(r)} />
+            <ListRow key={r} title={t(`reportReasons.${r}`)} onPress={() => sendReport(r)} />
           ))}
-        </Stack>
+        </ListGroup>
       </Sheet>
     </KeyboardAvoid>
   );

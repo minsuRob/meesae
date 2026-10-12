@@ -24,13 +24,19 @@ import { formatDateTime, regionName, useT, type MessageKey, type T } from '@/i18
 import { useClaims, useUid } from '@/store/session';
 import { useWallet } from '@/store/wallet';
 import { confirm, notify } from '@/ui/notify';
-import { Badge, Button, Card, Divider, Loading, Row, Stack, Text } from '@/ui/primitives';
+import { Button, Card, ListGroup, ListRow, Pill, Row, SkeletonList, Stack, Text, toast, type IconName } from '@/ui/primitives';
 import { layout, space, useColors } from '@/ui/theme';
 import { useNow } from '@/ui/useNow';
 
 import { verifyLocation } from '../location/current';
 
 const SHOP_IDS = Object.keys(SHOP_ITEMS) as ShopItemId[];
+const SHOP_ICON: Record<ShopItemId, IconName> = {
+  boost: 'flash-outline',
+  superLike: 'star-outline',
+  readReceipt: 'eye-outline',
+  extraFilters: 'options-outline',
+};
 
 function reasonLabel(reason: string, t: T): string {
   if (reason.startsWith('purchase:')) {
@@ -54,7 +60,7 @@ export function PointsHub() {
   const [busy, setBusy] = useState<string | null>(null);
   const now = useNow();
 
-  if (loading || !wallet) return <Loading />;
+  if (loading || !wallet) return <SkeletonList kind="row" count={4} />;
   const today = dayKey(now, eco.DAY_RESET_UTC_OFFSET_MIN);
   const canCheckIn = canClaimDaily(wallet.lastCheckInDate ?? undefined, today);
   const canLocation = canClaimDaily(wallet.lastLocationRewardDate ?? undefined, today);
@@ -73,14 +79,14 @@ export function PointsHub() {
   const checkIn = () =>
     run('checkin', async () => {
       const r = await call('dailyCheckIn', {});
-      notify(r.rewarded > 0 ? t('points.checkInDone', { n: r.rewarded }) : t('points.checkInAlready'));
+      toast(r.rewarded > 0 ? t('points.checkInDone', { n: r.rewarded }) : t('points.checkInAlready'));
     });
 
   const location = () =>
     run('location', async () => {
       const r = await verifyLocation();
       notify(
-        `📍 ${regionName(r.regionLabels, r.regionLabel, locale)}`,
+        regionName(r.regionLabels, r.regionLabel, locale) ?? '',
         r.rewarded > 0 ? t('map.rewarded', { n: r.rewarded }) : t('map.alreadyRewarded'),
       );
     });
@@ -101,116 +107,119 @@ export function PointsHub() {
   return (
     <ScrollView
       style={{ backgroundColor: colors.bg }}
-      contentContainerStyle={{ padding: space.lg, gap: space.lg, maxWidth: layout.contentMaxWidth, width: '100%', alignSelf: 'center' }}
+      contentContainerStyle={{ padding: space.lg, gap: space.xl, maxWidth: layout.contentMaxWidth, width: '100%', alignSelf: 'center' }}
     >
-      <Card style={{ backgroundColor: colors.pointSoft, borderColor: colors.pointCardBorder }}>
-        <Text variant="caption">{t('points.balance')}</Text>
-        <Text variant="title" color={colors.pointText}>
+      <Card style={{ padding: space.xl }}>
+        <Text variant="label" tone="muted">
+          {t('points.balance')}
+        </Text>
+        <Text variant="display" style={{ fontSize: 40, lineHeight: 48, marginTop: space.xs }}>
           {t('common.points', { n: wallet.balance })}
         </Text>
-        <Row gap={space.lg} style={{ marginTop: space.sm, flexWrap: 'wrap' }}>
-          <Text variant="caption">{t('points.freeIntrosLeft', { n: remainingFreeIntros(wallet.freeIntrosUsed, eco) })}</Text>
-          <Text variant="caption">{t('points.freeLikesLeft', { n: remainingFreeLikes(wallet.dailyLikes, today, eco) })}</Text>
+        <Row gap={space.sm} style={{ marginTop: space.md, flexWrap: 'wrap' }}>
+          <Pill label={t('points.freeIntrosLeft', { n: remainingFreeIntros(wallet.freeIntrosUsed, eco) })} tone="neutral" />
+          <Pill label={t('points.freeLikesLeft', { n: remainingFreeLikes(wallet.dailyLikes, today, eco) })} tone="neutral" />
         </Row>
       </Card>
 
-      <Text variant="heading">{t('points.earn')}</Text>
-      <Card>
-        <Stack gap={space.md}>
-          <Row style={{ justifyContent: 'space-between' }}>
-            <Stack gap={2} style={{ flex: 1 }}>
-              <Text variant="label">{t('points.checkIn')}</Text>
-              <Text variant="caption">{t('points.checkInDesc', { n: eco.CHECKIN_REWARD })}</Text>
-            </Stack>
+      <ListGroup title={t('points.earn')}>
+        <ListRow
+          icon="calendar-outline"
+          title={t('points.checkIn')}
+          subtitle={t('points.checkInDesc', { n: eco.CHECKIN_REWARD })}
+          trailing={
             <Button
               title={canCheckIn ? t('points.claim') : t('points.claimed')}
               small
+              pill
               disabled={!canCheckIn}
               loading={busy === 'checkin'}
               onPress={checkIn}
             />
-          </Row>
-          <Divider />
-          <Row style={{ justifyContent: 'space-between' }}>
-            <Stack gap={2} style={{ flex: 1 }}>
-              <Text variant="label">{t('points.location')}</Text>
-              <Text variant="caption">{t('points.locationDesc', { n: eco.LOCATION_REWARD })}</Text>
-            </Stack>
+          }
+        />
+        <ListRow
+          icon="location-outline"
+          title={t('points.location')}
+          subtitle={t('points.locationDesc', { n: eco.LOCATION_REWARD })}
+          trailing={
             <Button
               title={canLocation ? t('points.verify') : t('points.refresh')}
               small
+              pill
               kind={canLocation ? 'primary' : 'secondary'}
               loading={busy === 'location'}
               onPress={location}
             />
-          </Row>
-          <Divider />
-          <Row style={{ justifyContent: 'space-between' }}>
-            <Stack gap={2} style={{ flex: 1 }}>
-              <Row gap={space.xs}>
-                <Text variant="label">{t('points.phone')}</Text>
-                {claims.phoneVerified ? <Badge label={t('common.done')} /> : null}
-              </Row>
-              <Text variant="caption">{t('points.phoneDesc', { n: eco.PHONE_VERIFIED_REWARD })}</Text>
-            </Stack>
-            {!claims.phoneVerified ? <Button title={t('points.verify')} small onPress={() => router.push('/profile/phone-verify')} /> : null}
-          </Row>
-        </Stack>
-      </Card>
+          }
+        />
+        <ListRow
+          icon="phone-portrait-outline"
+          title={t('points.phone')}
+          subtitle={t('points.phoneDesc', { n: eco.PHONE_VERIFIED_REWARD })}
+          trailing={
+            claims.phoneVerified ? (
+              <Pill label={t('common.done')} tone="success" icon="checkmark-circle" />
+            ) : (
+              <Button title={t('points.verify')} small pill onPress={() => router.push('/profile/phone-verify')} />
+            )
+          }
+        />
+      </ListGroup>
 
-      <Text variant="heading">{t('points.shop')}</Text>
-      <Stack gap={space.sm}>
+      <ListGroup title={t('points.shop')}>
         {SHOP_IDS.map((id) => {
           const until = wallet.perks[id] ?? 0;
           const owned = wallet.inventory[id] ?? 0;
+          const extra =
+            until > now ? t('points.until', { date: formatDateTime(until, tag) }) : owned > 0 ? t('points.owned', { n: owned }) : null;
           return (
-            <Card key={id}>
-              <Row style={{ justifyContent: 'space-between' }}>
-                <Stack gap={2} style={{ flex: 1 }}>
-                  <Text variant="label">{t(`shop.${id}.title`)}</Text>
-                  <Text variant="caption">{t(`shop.${id}.desc`)}</Text>
-                  {until > now ? (
-                    <Text variant="caption" color={colors.success}>
-                      {t('points.until', { date: formatDateTime(until, tag) })}
-                    </Text>
-                  ) : null}
-                  {owned > 0 ? (
-                    <Text variant="caption" color={colors.success}>
-                      {t('points.owned', { n: owned })}
-                    </Text>
-                  ) : null}
-                </Stack>
+            <ListRow
+              key={id}
+              icon={SHOP_ICON[id]}
+              title={t(`shop.${id}.title`)}
+              subtitle={extra ? `${t(`shop.${id}.desc`)}\n${extra}` : t(`shop.${id}.desc`)}
+              trailing={
                 <Button
                   title={t('common.points', { n: SHOP_ITEMS[id].cost })}
                   small
+                  pill
                   kind="secondary"
                   loading={busy === `buy:${id}`}
                   onPress={() => buy(id)}
                 />
-              </Row>
-            </Card>
+              }
+            />
           );
         })}
-      </Stack>
+      </ListGroup>
 
-      <Text variant="heading">{t('points.history')}</Text>
-      <Card>
-        <Stack gap={space.sm}>
-          {ledger.data.length === 0 ? <Text variant="caption">{t('points.noHistory')}</Text> : null}
-          {ledger.data.map((e) => (
-            <Row key={e.id} style={{ justifyContent: 'space-between' }}>
-              <Stack gap={0} style={{ flex: 1 }}>
-                <Text>{reasonLabel(e.reason, t)}</Text>
-                <Text variant="caption">{formatDateTime(e.createdAt, tag)}</Text>
-              </Stack>
-              <Text variant="label" color={e.delta > 0 ? colors.success : colors.danger}>
-                {e.delta > 0 ? '+' : '−'}
-                {t('common.points', { n: Math.abs(e.delta) })}
-              </Text>
-            </Row>
-          ))}
-        </Stack>
-      </Card>
+      <Stack gap={space.sm}>
+        <Text variant="heading" style={{ marginBottom: space.xs }}>
+          {t('points.history')}
+        </Text>
+        {ledger.data.length === 0 ? (
+          <Text variant="bodySm" tone="muted">
+            {t('points.noHistory')}
+          </Text>
+        ) : (
+          <ListGroup>
+            {ledger.data.map((e) => (
+              <ListRow
+                key={e.id}
+                title={reasonLabel(e.reason, t)}
+                subtitle={formatDateTime(e.createdAt, tag)}
+                trailing={
+                  <Text variant="subtitle" color={e.delta > 0 ? colors.success : colors.text}>
+                    {e.delta > 0 ? '+' : '-'}
+                    {t('common.points', { n: Math.abs(e.delta) })}
+                  </Text>
+                }
+              />
+            ))}
+          </ListGroup>
+        )}
+      </Stack>
     </ScrollView>
   );
 }

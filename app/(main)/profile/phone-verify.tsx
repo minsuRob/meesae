@@ -18,7 +18,7 @@ import { useMyProfile } from '@/features/profile/useMyProfile';
 import { countryName, useT } from '@/i18n';
 import { useClaims } from '@/store/session';
 import { notify } from '@/ui/notify';
-import { Button, Chip, ErrorText, Input, Row, Screen, Stack, Text } from '@/ui/primitives';
+import { Button, Chip, ErrorText, HeaderBar, Input, Row, Screen, Stack, Text } from '@/ui/primitives';
 import { space, useColors } from '@/ui/theme';
 
 export default function PhoneVerifyScreen() {
@@ -68,15 +68,18 @@ export default function PhoneVerifyScreen() {
 
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.bg }}>
+      <HeaderBar title={t('phone.title')} center onBack={() => router.back()} backLabel={t('common.back')} />
       <Screen scroll narrow edges={[]}>
         <Stack gap={space.lg}>
-          <Button title={`← ${t('common.back')}`} kind="ghost" small style={{ alignSelf: 'flex-start' }} onPress={() => router.back()} />
-          <Text variant="title">{t('phone.title')}</Text>
           {claims.phoneVerified ? (
-            <Text color={colors.success}>{t('phone.done')}</Text>
+            <Text color={colors.success} variant="subtitle">
+              {t('phone.done')}
+            </Text>
           ) : (
             <>
-              <Text variant="caption">{t('phone.intro')}</Text>
+              <Text variant="bodySm" tone="muted">
+                {t('phone.intro')}
+              </Text>
               <Row style={{ flexWrap: 'wrap' }}>
                 {COUNTRIES.slice(0, 8).map((c) => (
                   <Chip key={c.code} label={`${c.flag} +${c.dial}`} selected={cc === c.code} onPress={() => setCountry(c.code)} />

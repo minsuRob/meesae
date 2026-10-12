@@ -25,10 +25,10 @@ export default function OnboardingLayout() {
   const progress = (stepIndex(step) + 1) / STEPS.length;
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.bg }}>
-      <View style={{ padding: space.lg, width: '100%', maxWidth: layout.contentMaxWidth, alignSelf: 'center' }}>
+      <View style={{ paddingHorizontal: space.lg, paddingTop: space.md, width: '100%', maxWidth: layout.contentMaxWidth, alignSelf: 'center' }}>
         <ProgressBar value={progress} />
       </View>
-      <Stack screenOptions={{ headerShown: false, animation: 'slide_from_right' }} />
+      <Stack screenOptions={{ headerShown: false, animation: 'slide_from_right', contentStyle: { backgroundColor: colors.bg } }} />
     </SafeAreaView>
   );
 }

@@ -23,6 +23,7 @@ export const ko = {
     skip: '건너뛰기',
     start: '시작하기',
     done: '완료',
+    close: '닫기',
     points: (p: { n: number }) => `${p.n.toLocaleString('ko-KR')}P`,
   },
 
@@ -190,6 +191,7 @@ export const ko = {
     map: '지도',
     feed: '피드',
     myProfile: '내 프로필',
+    unreadA11y: (p: { n: number }) => `안 읽은 메시지 ${p.n}개`,
   },
 
   header: {
@@ -215,6 +217,10 @@ export const ko = {
     lowPointsAction: '포인트 받으러 가기',
     pickPane: '대화나 프로필을 골라 주세요',
     pickPaneBody: '왼쪽 목록에서 고르면 여기에 열려요',
+    searchTitle: '누구를 만나볼까요?',
+    anyone: '전체',
+    ageRange: (p: { min: number; max: number }) => `${p.min}~${p.max}세`,
+    verified: '인증',
   },
 
   filters: {
@@ -234,6 +240,8 @@ export const ko = {
   },
 
   chat: {
+    today: '오늘',
+    yesterday: '어제',
     title: '대화',
     empty: '아직 대화가 없어요',
     emptyBody: '추천 탭에서 마음에 드는 사람에게 먼저 말을 걸어 보세요',
@@ -315,6 +323,7 @@ export const ko = {
     tabFeed: '피드',
     tabPoints: '포인트',
     write: '글쓰기',
+    post: '게시물',
     empty: '첫 글을 남겨 보세요',
     emptyBody: '같은 나라 사람들에게 보여요',
     loadFailed: '피드를 불러오지 못했어요',
@@ -389,6 +398,7 @@ export const ko = {
   },
 
   me: {
+    title: '내 프로필',
     settings: '설정',
     phoneBadge: '휴대폰 인증',
     verifyCta: '휴대폰 인증하고 사진 전송·위치공유 열기',
@@ -398,6 +408,9 @@ export const ko = {
 
   settings: {
     title: '설정',
+    sectionPreferences: '환경설정',
+    sectionRegion: '지역',
+    sectionAccount: '계정',
     country: '국가',
     countryHint: '추천과 피드는 선택한 나라를 기준으로 보여 드려요',
     region: '내 동네',

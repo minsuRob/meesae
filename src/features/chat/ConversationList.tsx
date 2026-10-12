@@ -1,4 +1,4 @@
-import { FlatList, Pressable, View } from 'react-native';
+import { FlatList, View } from 'react-native';
 
 import { otherMember, peerLeft, type Conversation, type UserPublic } from '@shared/models';
 
@@ -7,12 +7,20 @@ import { useDoc, useQuery } from '@/firebase/hooks';
 import { useStorageUrl } from '@/firebase/storage';
 import { useT, type T } from '@/i18n';
 import { useUid } from '@/store/session';
-import { Avatar, Badge, Empty, Loading, Row, Stack, Text } from '@/ui/primitives';
-import { radius, space, useColors } from '@/ui/theme';
+import { Avatar, Divider, Empty, Pill, Press, Row, SkeletonList, Stack, Text } from '@/ui/primitives';
+import { space, useColors } from '@/ui/theme';
 
 export function useConversations() {
   const uid = useUid();
   return useQuery(uid ? queries.myConversations(uid) : null, uid ? `convs:${uid}` : null);
+}
+
+/** 모든 대화의 안 읽은 메시지 합 (탭·사이드바 배지) */
+export function useUnreadCount(): number {
+  const uid = useUid();
+  const { data } = useConversations();
+  if (!uid) return 0;
+  return data.reduce((sum, c) => sum + (c.unread?.[uid] ?? 0), 0);
 }
 
 function timeLabel(ms: number, tag: string): string {
@@ -42,65 +50,60 @@ function ConversationRow({ c, me, selected, onPress }: { c: Conversation; me: st
   const deleted = peerLeft(c, me);
   const name = deleted ? t('chat.deletedUser') : (peer?.nickname ?? t('chat.unknownUser'));
   return (
-    <Pressable
+    <Press
       onPress={onPress}
-      style={({ pressed }) => ({
-        padding: space.md,
-        backgroundColor: selected ? colors.primarySoft : pressed ? colors.bgMuted : colors.surface,
+      haptic={false}
+      pressScale={1}
+      accessibilityRole="button"
+      style={(pressed) => ({
+        paddingHorizontal: space.lg,
+        paddingVertical: space.md,
+        backgroundColor: selected || pressed ? colors.bgMuted : colors.surface,
       })}
     >
       <Row gap={space.md}>
-        <Avatar uri={avatar} name={peer?.nickname} size={48} icon={deleted ? 'person-remove-outline' : undefined} />
-        <Stack gap={2} style={{ flex: 1 }}>
+        <Avatar uri={avatar} name={peer?.nickname} size="lg" icon={deleted ? 'person-remove-outline' : undefined} verified={peer?.badges.includes('phone')} />
+        <Stack gap={space.xxs} style={{ flex: 1 }}>
           <Row style={{ justifyContent: 'space-between' }}>
-            <Row gap={space.xs}>
-              <Text variant="label" color={deleted ? colors.textMuted : undefined}>
+            <Row gap={space.xs} style={{ flex: 1 }}>
+              <Text variant="subtitle" tone={deleted ? 'muted' : 'default'} numberOfLines={1} style={{ flexShrink: 1 }}>
                 {name}
               </Text>
-              {c.kind === 'match' ? <Badge label={t('chat.badgeMatch')} color={colors.primary} /> : null}
-              {c.closedBy ? <Badge label={t('chat.badgeClosed')} color={colors.textMuted} /> : null}
+              {c.kind === 'match' ? <Pill label={t('chat.badgeMatch')} tone="primary" /> : null}
+              {c.closedBy ? <Pill label={t('chat.badgeClosed')} tone="neutral" /> : null}
             </Row>
-            <Text variant="caption">{c.lastMessage ? timeLabel(c.lastMessage.at, tag) : ''}</Text>
+            <Text variant="caption" tone="faint">
+              {c.lastMessage ? timeLabel(c.lastMessage.at, tag) : ''}
+            </Text>
           </Row>
           <Row style={{ justifyContent: 'space-between' }}>
-            <Text variant="caption" numberOfLines={1} style={{ flex: 1 }}>
+            <Text variant="bodySm" tone={unread > 0 ? 'default' : 'muted'} numberOfLines={1} style={[{ flex: 1 }, unread > 0 && { fontWeight: '500' }]}>
               {previewText(c, t)}
             </Text>
-            {unread > 0 ? (
-              <View
-                style={{
-                  minWidth: 20,
-                  paddingHorizontal: 6,
-                  borderRadius: radius.pill,
-                  backgroundColor: colors.primary,
-                  alignItems: 'center',
-                }}
-              >
-                <Text variant="caption" color={colors.textInverse}>
-                  {unread > 99 ? '99+' : unread}
-                </Text>
-              </View>
-            ) : null}
+            {unread > 0 ? <Pill label={unread > 99 ? '99+' : String(unread)} tone="primary" /> : null}
           </Row>
         </Stack>
       </Row>
-    </Pressable>
+    </Press>
   );
 }
 
 export function ConversationList({ selectedId, onOpen }: { selectedId?: string; onOpen: (id: string) => void }) {
-  const colors = useColors();
   const { t } = useT();
   const me = useUid();
   const { data, loading, error } = useConversations();
-  if (!me || loading) return <Loading />;
-  if (error) return <Empty title={t('chat.loadFailed')} />;
-  if (!data.length) return <Empty title={t('chat.empty')} body={t('chat.emptyBody')} />;
+  if (!me || loading) return <SkeletonList kind="row" count={5} />;
+  if (error) return <Empty icon="alert-circle-outline" title={t('chat.loadFailed')} />;
+  if (!data.length) return <Empty icon="chatbubbles-outline" title={t('chat.empty')} body={t('chat.emptyBody')} />;
   return (
     <FlatList
       data={data}
       keyExtractor={(c) => c.id}
-      ItemSeparatorComponent={() => <View style={{ height: 1, backgroundColor: colors.border }} />}
+      ItemSeparatorComponent={() => (
+        <View style={{ paddingLeft: space.lg + 48 + space.md }}>
+          <Divider />
+        </View>
+      )}
       renderItem={({ item }) => <ConversationRow c={item} me={me} selected={item.id === selectedId} onPress={() => onOpen(item.id)} />}
     />
   );

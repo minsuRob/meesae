@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>meesae 다크 팔레트 시안</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<style>
+  /* ── 페이지 ─────────────────────────────────────────────── */
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: #08080a; color: #ddd; font-family: "Pretendard Variable", Pretendard, -apple-system, system-ui, sans-serif; }
+  .bar { display: flex; gap: 12px; align-items: center; padding: 12px 16px; font-size: 13px; color: #aaa; flex-wrap: wrap; }
+  .bar a, .bar button { color: #eee; background: #1c1c20; border: 1px solid #333; border-radius: 999px; padding: 4px 10px; text-decoration: none; font: inherit; cursor: pointer; }
+  .bar a.on { background: #eee; color: #111; }
+  .bar input[type=range] { width: 160px; }
+  .frames { display: flex; gap: 20px; padding: 0 16px 32px; overflow-x: auto; align-items: flex-start; }
+  .col { flex: 0 0 375px; }
+  .col h2 { font-size: 15px; margin: 0 0 4px; color: #fff; }
+  .col p.desc { font-size: 12px; color: #999; margin: 0 0 10px; height: 32px; line-height: 16px; }
+
+  /* ── 폰 프레임 (앱 토큰은 전부 CSS 변수) ───────────────── */
+  .frame { width: 375px; height: 812px; border-radius: 40px; overflow: hidden; position: relative;
+    background: var(--bg); color: var(--text); font-size: 16px; line-height: 24px; border: 1px solid #222; }
+  .scroll { position: absolute; inset: 0 0 72px 0; overflow-y: auto; scrollbar-width: none; }
+  .scroll::-webkit-scrollbar { display: none; }
+
+  /* 헤더 */
+  .hdr { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; gap: 10px; padding: 50px 16px 10px;
+    background: var(--s1); border-bottom: 1px solid var(--hair); }
+  .wordmark { font-weight: 800; font-size: 22px; letter-spacing: -0.5px; color: var(--primary); margin-right: auto; }
+  .seg { position: relative; display: flex; background: var(--s2); border-radius: 999px; padding: 3px; width: 128px; }
+  .seg i { position: absolute; top: 3px; bottom: 3px; left: 3px; width: calc(50% - 3px); border-radius: 999px; background: var(--s3); box-shadow: var(--e1); }
+  .seg b { flex: 1; text-align: center; font-size: 13px; font-weight: 600; z-index: 1; line-height: 26px; color: var(--muted); }
+  .seg b.on { color: var(--textStrong); }
+  .icb { width: 36px; height: 36px; border-radius: 999px; background: var(--s2); display: grid; place-items: center; position: relative; }
+  .icb .dot { position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; border-radius: 99px; background: var(--primary); border: 2px solid var(--s2); }
+  .pill { display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 9px; border-radius: 999px; font-size: 12px; font-weight: 600; line-height: 1; }
+  .pill.point { background: var(--pointSoft); color: var(--pointText); }
+  .pill.primary { background: var(--primarySoft); color: var(--onPrimarySoft); }
+  .pill.accent { background: color-mix(in srgb, var(--accent) 18%, transparent); color: var(--accent); }
+  .pill.neutral { background: var(--s2); color: var(--muted); }
+  .pill.onPhoto { background: rgba(0,0,0,.38); color: #fff; backdrop-filter: blur(6px); }
+  .pill.online { background: rgba(0,0,0,.38); color: #fff; padding-left: 7px; }
+  .pill.online::before { content: ""; width: 7px; height: 7px; border-radius: 99px; background: var(--online); box-shadow: 0 0 0 2px rgba(0,0,0,.25); }
+  .pill.unread { background: var(--primaryFill); color: var(--onPrimary); min-width: 20px; justify-content: center; height: 20px; padding: 0 6px; }
+  .avatar { width: 34px; height: 34px; border-radius: 999px; background: var(--s3); position: relative; }
+  .avatar.lg { width: 48px; height: 48px; }
+  .avatar .v { position: absolute; right: -2px; bottom: -2px; width: 14px; height: 14px; border-radius: 99px; background: var(--verified); border: 2px solid var(--s1); }
+  .avatar .on { position: absolute; right: 0; bottom: 0; width: 12px; height: 12px; border-radius: 99px; background: var(--online); border: 2px solid var(--s1); }
+
+  /* 섹션 */
+  .sec { padding: 14px 16px 4px; }
+  .sec h3 { margin: 0 0 10px; font-size: 11px; letter-spacing: .6px; font-weight: 700; color: var(--faint); text-transform: uppercase; }
+
+  /* 추천 카드 */
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .card { border-radius: 18px; overflow: hidden; background: var(--s1); border: 1px solid var(--hair); box-shadow: var(--e1); }
+  .photo { aspect-ratio: 3/4; position: relative; background: var(--ph); }
+  .photo .scrim { position: absolute; inset: auto 0 0 0; height: 62%; background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,.35) 45%, rgba(0,0,0,.78) 100%); }
+  .photo .tl { position: absolute; top: 10px; left: 10px; }
+  .photo .info { position: absolute; left: 12px; right: 12px; bottom: 12px; color: #fff; }
+  .photo .name { font-weight: 700; font-size: 17px; line-height: 22px; display: flex; align-items: center; gap: 4px; }
+  .photo .name span { font-weight: 500; opacity: .85; font-size: 15px; }
+  .photo .name .vv { width: 14px; height: 14px; border-radius: 99px; background: var(--verified); display: inline-grid; place-items: center; }
+  .photo .meta { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
+  .photo .meta .pill { height: 20px; font-size: 11px; padding: 0 7px; }
+  .photo .acts { position: absolute; right: 10px; bottom: 10px; display: flex; gap: 6px; }
+  .rb { width: 34px; height: 34px; border-radius: 999px; display: grid; place-items: center; background: rgba(0,0,0,.42); color: #fff; backdrop-filter: blur(6px); }
+  .rb.like { background: var(--primaryFill); color: var(--onPrimary); }
+
+  /* 대화 */
+  .row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--hair); }
+  .row:last-child { border-bottom: 0; }
+  .row .t { flex: 1; min-width: 0; }
+  .row .t b { font-weight: 600; font-size: 15px; color: var(--textStrong); display: flex; gap: 6px; align-items: center; }
+  .row .t small { display: block; color: var(--muted); font-size: 13px; line-height: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .row .r { text-align: right; display: grid; gap: 4px; justify-items: end; }
+  .row .r time { color: var(--faint); font-size: 11px; }
+  .chat { padding: 4px 0; display: grid; gap: 4px; }
+  .day { justify-self: center; margin: 6px 0; }
+  .bub { max-width: 78%; padding: 8px 12px; border-radius: 18px; font-size: 15px; line-height: 21px; }
+  .bub.them { background: var(--s2); color: var(--text); justify-self: start; border-bottom-left-radius: 6px; }
+  .bub.me { background: var(--primaryFill); color: var(--onPrimary); justify-self: end; border-bottom-right-radius: 6px; }
+  .bub.me + .bub.me { border-top-right-radius: 6px; margin-top: -2px; }
+  .inbar { display: flex; gap: 8px; align-items: center; padding: 10px 12px; background: var(--s1); border-top: 1px solid var(--hair); border-radius: 0; margin: 10px -16px 0; }
+  .inbar .in { flex: 1; height: 40px; border-radius: 999px; background: var(--s2); color: var(--faint); padding: 0 14px; line-height: 40px; font-size: 15px; }
+  .inbar .send { width: 36px; height: 36px; border-radius: 999px; background: var(--primaryFill); color: var(--onPrimary); display: grid; place-items: center; }
+
+  /* 포인트 */
+  .hero { border-radius: 18px; padding: 16px; color: #fff; background: var(--gradPoint); position: relative; overflow: hidden; }
+  .hero small { font-size: 13px; opacity: .9; }
+  .hero .big { font-size: 34px; line-height: 40px; font-weight: 800; letter-spacing: -0.5px; margin: 2px 0 8px; }
+  .hero .pills { display: flex; gap: 6px; }
+  .group { margin-top: 10px; border-radius: 16px; background: var(--s1); border: 1px solid var(--hair); box-shadow: var(--e1); padding: 0 14px; }
+  .lrow { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--hair); }
+  .lrow:last-child { border-bottom: 0; }
+  .lrow .ic { width: 32px; height: 32px; border-radius: 10px; background: var(--s2); display: grid; place-items: center; color: var(--primary); }
+  .lrow .t { flex: 1; } .lrow .t b { display: block; font-size: 15px; font-weight: 600; color: var(--textStrong); } .lrow .t small { color: var(--muted); font-size: 13px; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; height: 36px; padding: 0 16px; border-radius: 999px; font-size: 14px; font-weight: 600; }
+  .btn.sm { height: 30px; padding: 0 12px; font-size: 13px; }
+  .btn.primary { background: var(--primaryFill); color: var(--onPrimary); }
+  .btn.grad { background: var(--gradPrimary); color: var(--onPrimary); box-shadow: var(--e2); }
+  .btn.secondary { background: var(--s2); color: var(--textStrong); }
+  .btn.ghost { color: var(--text); }
+  .btn.danger { background: var(--danger); color: #fff; }
+  .btn.dis { opacity: .45; }
+  .btns { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .btn.press { transform: scale(var(--press, 1)); }
+
+  /* 텍스트 사다리 */
+  .ladder { background: var(--s1); border: 1px solid var(--hair); border-radius: 16px; padding: 10px 14px; }
+  .ladder div { display: flex; justify-content: space-between; align-items: baseline; padding: 4px 0; }
+  .ladder code { font-size: 11px; color: var(--faint); font-family: ui-monospace, monospace; }
+  .ladder code.ok { color: var(--online); } .ladder code.bad { color: var(--danger); }
+
+  /* 스켈레톤 */
+  .sk { height: 14px; border-radius: 7px; background: linear-gradient(90deg, var(--s2) 25%, var(--s3) 50%, var(--s2) 75%); background-size: 300% 100%; background-position: var(--shim, 100%) 0; }
+
+  /* 탭바 */
+  .tabbar { position: absolute; left: 0; right: 0; bottom: 0; height: 72px; background: var(--s1); border-top: 1px solid var(--hair); display: flex; padding: 6px 0 14px; }
+  .tab { flex: 1; display: grid; justify-items: center; gap: 2px; font-size: 11px; color: var(--muted); position: relative; }
+  .tab .ico { width: 48px; height: 28px; border-radius: 999px; display: grid; place-items: center; position: relative; }
+  .tab.on { color: var(--primary); }
+  .tab.on .ico { background: var(--primarySoft); }
+  .tab .badge { position: absolute; top: -2px; right: 6px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 99px; background: var(--primaryFill); color: var(--onPrimary); font-size: 10px; font-weight: 700; line-height: 16px; text-align: center; }
+  svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .rb svg, .send svg, .icb svg { width: 16px; height: 16px; }
+  .tab svg { width: 22px; height: 22px; }
+  .rb.like svg { fill: currentColor; }
+</style>
+</head>
+<body>
+<div class="bar">
+  <strong style="color:#fff">meesae 다크 팔레트 시안</strong>
+  <span>시안:</span>
+  <a href="?variant=all" data-v="all">전부</a><a href="?variant=A" data-v="A">A</a><a href="?variant=B" data-v="B">B</a><a href="?variant=C" data-v="C">C</a><a href="?variant=D" data-v="D">D(현재)</a>
+  <span>·</span>
+  <a href="?scheme=dark" data-s="dark">다크</a><a href="?scheme=light" data-s="light">라이트</a>
+  <span>·</span>
+  <label>진행도 <input id="hold" type="range" min="0" max="1" step="0.01" /> <code id="pv"></code></label>
+  <button id="play">▶ 재생</button>
+</div>
+<div class="frames" id="frames"></div>
+
+<script>
+/* ── 팔레트. 앱의 tokens.ts 에 그대로 옮길 값들 ───────────────── */
+const VARIANTS = {
+  A: { name: 'A 글램형', desc: '근검정 + 핫핑크. 큰 면적은 채도 한 단계 낮춤. 라벨은 흰색 (버튼 대비 3.8:1 감수)',
+    dark: { bg:'#0E0E12', s1:'#16161B', s2:'#1E1E24', s3:'#26262D', hair:'rgba(255,255,255,.09)',
+      textStrong:'#FFFFFF', text:'#F2F2F5', muted:'#A3A3AE', faint:'#6E6E78',
+      primary:'#FF3B6B', primaryFill:'#E8456F', onPrimary:'#FFFFFF', primarySoft:'#3A1522', onPrimarySoft:'#FF8FA8',
+      accent:'#A78BFA', verified:'#60A5FA', online:'#4ADE80', danger:'#F87171',
+      point:'#FBBF24', pointSoft:'#3A2E0B', pointText:'#FCD34D',
+      gradPrimary:'linear-gradient(135deg,#FF3B6B,#FF7A59)', gradPoint:'linear-gradient(135deg,#F59E0B,#EF4444)',
+      e1:'none', e2:'none' },
+    light: { bg:'#FFFFFF', s1:'#FFFFFF', s2:'#F4F4F6', s3:'#FFFFFF', hair:'rgba(0,0,0,.08)',
+      textStrong:'#0B0B0E', text:'#16161A', muted:'#6B6B76', faint:'#9A9AA3',
+      primary:'#F43F5E', primaryFill:'#E11D48', onPrimary:'#FFFFFF', primarySoft:'#FFE4E8', onPrimarySoft:'#BE123C',
+      accent:'#7C3AED', verified:'#2563EB', online:'#16A34A', danger:'#DC2626',
+      point:'#F59E0B', pointSoft:'#FEF3C7', pointText:'#92400E',
+      gradPrimary:'linear-gradient(135deg,#F43F5E,#F97316)', gradPoint:'linear-gradient(135deg,#F59E0B,#EF4444)',
+      e1:'0 1px 2px rgba(16,16,20,.06)', e2:'0 6px 16px rgba(225,29,72,.25)' } },
+  B: { name: 'B 웜 차콜 + 로즈/앰버', desc: '따뜻한 차콜. 로즈 위엔 거의 검정 라벨(대비 6:1↑). 포인트·접속 중은 앰버',
+    dark: { bg:'#121012', s1:'#1A1719', s2:'#221E21', s3:'#2A2529', hair:'rgba(255,255,255,.08)',
+      textStrong:'#FFFFFF', text:'#F4EFF1', muted:'#A89FA4', faint:'#72696E',
+      primary:'#F4587A', primaryFill:'#F4587A', onPrimary:'#1A0A0F', primarySoft:'#3B1A24', onPrimarySoft:'#FF9DB4',
+      accent:'#B48CF2', verified:'#7CB3FF', online:'#F5B547', danger:'#F87171',
+      point:'#F5B547', pointSoft:'#3A2B10', pointText:'#FFD27A',
+      gradPrimary:'linear-gradient(135deg,#F4587A,#F58A5E)', gradPoint:'linear-gradient(135deg,#F5B547,#E8456F)',
+      e1:'none', e2:'none' },
+    light: { bg:'#FFFBFA', s1:'#FFFFFF', s2:'#F6F1F0', s3:'#FFFFFF', hair:'rgba(40,20,25,.09)',
+      textStrong:'#15090D', text:'#1F1418', muted:'#6E6166', faint:'#9C9094',
+      primary:'#E8486C', primaryFill:'#E8486C', onPrimary:'#1A0A0F', primarySoft:'#FFE3EA', onPrimarySoft:'#B9173F',
+      accent:'#7A5AF0', verified:'#2563EB', online:'#D98B0B', danger:'#DC2626',
+      point:'#D98B0B', pointSoft:'#FFF0CF', pointText:'#7A4B00',
+      gradPrimary:'linear-gradient(135deg,#E8486C,#F08A5E)', gradPoint:'linear-gradient(135deg,#F5B547,#E8486C)',
+      e1:'0 1px 2px rgba(40,20,25,.06)', e2:'0 6px 16px rgba(232,72,108,.25)' } },
+  C: { name: 'C 쿨 그라파이트 + 코랄/바이올렛', desc: '차가운 그라파이트. 코랄 주색(큰 면적은 깊은 코랄 + 흰 라벨 4.7:1), 거리·링크는 바이올렛',
+    dark: { bg:'#0F1115', s1:'#161920', s2:'#1D212A', s3:'#252A34', hair:'rgba(255,255,255,.09)',
+      textStrong:'#FFFFFF', text:'#EEF0F5', muted:'#A3A8B8', faint:'#6F7586',
+      primary:'#FF6B5B', primaryFill:'#D23F2B', onPrimary:'#FFFFFF', primarySoft:'#3A1C1A', onPrimarySoft:'#FF9A8C',
+      accent:'#8B7CF6', verified:'#5EA6FF', online:'#4ADE80', danger:'#F87171',
+      point:'#F5B547', pointSoft:'#34290F', pointText:'#FFD27A',
+      gradPrimary:'linear-gradient(135deg,#FF6B5B,#D23F2B)', gradPoint:'linear-gradient(135deg,#8B7CF6,#D23F2B)',
+      e1:'none', e2:'none' },
+    light: { bg:'#FAFBFD', s1:'#FFFFFF', s2:'#F1F3F7', s3:'#FFFFFF', hair:'rgba(20,24,40,.08)',
+      textStrong:'#0B0E16', text:'#171B26', muted:'#636A7E', faint:'#9299AC',
+      primary:'#F0604F', primaryFill:'#D23F2B', onPrimary:'#FFFFFF', primarySoft:'#FFE6E1', onPrimarySoft:'#B32E1C',
+      accent:'#6D5BD0', verified:'#2563EB', online:'#16A34A', danger:'#DC2626',
+      point:'#D98B0B', pointSoft:'#FFF0CF', pointText:'#7A4B00',
+      gradPrimary:'linear-gradient(135deg,#F0604F,#D23F2B)', gradPoint:'linear-gradient(135deg,#6D5BD0,#D23F2B)',
+      e1:'0 1px 2px rgba(20,24,40,.06)', e2:'0 6px 16px rgba(210,63,43,.25)' } },
+  D: { name: 'D 현재 (비교용)', desc: '지금 theme.ts 그대로. 표면 단계·헤어라인 없음, 흰 라벨 3.1:1',
+    dark: { bg:'#0F0F12', s1:'#16161A', s2:'#1C1C21', s3:'#1C1C21', hair:'#2A2A31',
+      textStrong:'#F2F2F5', text:'#F2F2F5', muted:'#9A9AA6', faint:'#9A9AA6',
+      primary:'#FB5A76', primaryFill:'#FB5A76', onPrimary:'#FFFFFF', primarySoft:'#3A1520', onPrimarySoft:'#FDA4B4',
+      accent:'#A78BFA', verified:'#60A5FA', online:'#4ADE80', danger:'#F87171',
+      point:'#FBBF24', pointSoft:'#3A2E0B', pointText:'#FCD34D',
+      gradPrimary:'#FB5A76', gradPoint:'#3A2E0B', e1:'none', e2:'none' },
+    light: { bg:'#FFFFFF', s1:'#FFFFFF', s2:'#F4F4F6', s3:'#FFFFFF', hair:'#E7E7EA',
+      textStrong:'#16161A', text:'#16161A', muted:'#6B6B76', faint:'#6B6B76',
+      primary:'#F43F5E', primaryFill:'#F43F5E', onPrimary:'#FFFFFF', primarySoft:'#FFE4E8', onPrimarySoft:'#BE123C',
+      accent:'#7C3AED', verified:'#2563EB', online:'#16A34A', danger:'#DC2626',
+      point:'#F59E0B', pointSoft:'#FEF3C7', pointText:'#92400E',
+      gradPrimary:'#F43F5E', gradPoint:'#FEF3C7', e1:'none', e2:'none' } },
+};
+
+/* ── WCAG 대비 (앱의 contrast.test.ts 와 같은 수식) ─────────────── */
+function parse(c) {
+  if (c.startsWith('#')) { const h = c.length === 4 ? c.slice(1).split('').map(x => x + x).join('') : c.slice(1); return [parseInt(h.slice(0,2),16), parseInt(h.slice(2,4),16), parseInt(h.slice(4,6),16), 1]; }
+  const m = c.match(/rgba?\(([^)]+)\)/); const [r,g,b,a=1] = m[1].split(',').map(Number); return [r,g,b,a];
+}
+function over(fg, bg) { const [r,g,b,a] = parse(fg), [R,G,B] = parse(bg); return [r*a+R*(1-a), g*a+G*(1-a), b*a+B*(1-a)]; }
+function lum([r,g,b]) { const f = v => { v /= 255; return v <= 0.03928 ? v/12.92 : ((v+0.055)/1.055) ** 2.4; }; return 0.2126*f(r)+0.7152*f(g)+0.0722*f(b); }
+function ratio(fg, bg) { const a = lum(over(fg,bg)), b = lum(parse(bg).slice(0,3)); return (Math.max(a,b)+0.05)/(Math.min(a,b)+0.05); }
+const cr = (fg, bg, min) => { const r = ratio(fg, bg); return `<code class="${r >= min ? 'ok' : 'bad'}">${r.toFixed(2)}:1</code>`; };
+
+/* ── 아이콘 ─────────────────────────────────────────────────── */
+const I = {
+  heart: '<svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>',
+  send: '<svg viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>',
+  up: '<svg viewBox="0 0 24 24"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>',
+  filter: '<svg viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4"/></svg>',
+  chat: '<svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-8 8H5l-2 2V12a8 8 0 0 1 8-8h2a8 8 0 0 1 8 8z"/></svg>',
+  map: '<svg viewBox="0 0 24 24"><path d="M1 6v16l7-4 8 4 7-4V2l-7 4-8-4-7 4z"/><path d="M8 2v16M16 6v16"/></svg>',
+  news: '<svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>',
+  check: '<svg viewBox="0 0 24 24" style="width:9px;height:9px;stroke:#fff;stroke-width:3"><path d="M5 12l4 4L19 6"/></svg>',
+  cal: '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M8 2v4M16 2v4M3 10h18"/></svg>',
+  bolt: '<svg viewBox="0 0 24 24"><path d="M13 2L3 14h8l-1 8 10-12h-8l1-8z"/></svg>',
+  pin: '<svg viewBox="0 0 24 24"><path d="M12 22s7-7 7-12a7 7 0 1 0-14 0c0 5 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>',
+  gem: '<svg viewBox="0 0 24 24" style="width:12px;height:12px"><path d="M6 3h12l4 6-10 12L2 9l4-6z"/></svg>',
+};
+
+/* ── 프레임 한 장 ────────────────────────────────────────────── */
+function frame(key, scheme) {
+  const v = VARIANTS[key], t = v[scheme];
+  const vars = Object.entries(t).map(([k, val]) => `--${k}:${val}`).join(';');
+  const ph1 = 'radial-gradient(120% 90% at 30% 20%, #6b4b7a 0%, #2e2340 45%, #141020 100%)';
+  const ph2 = 'radial-gradient(110% 100% at 70% 30%, #c98a5a 0%, #6a4a3a 50%, #221612 100%)';
+  const card = (ph, name, age, meta, online) => `
+    <div class="card"><div class="photo" style="--ph:${ph}">
+      <div class="scrim"></div>
+      ${online ? '<span class="pill online tl">접속 중</span>' : ''}
+      <div class="info">
+        <div class="name">${name} <span>${age}</span><i class="vv">${I.check}</i></div>
+        <div class="meta">${meta.map(m => `<span class="pill onPhoto">${m}</span>`).join('')}</div>
+      </div>
+      <div class="acts"><span class="rb">${I.send}</span><span class="rb like">${I.heart}</span></div>
+    </div></div>`;
+  return `
+  <div class="col">
+    <h2>${v.name}</h2><p class="desc">${v.desc}</p>
+    <div class="frame" style="${vars}" data-variant="${key}">
+      <div class="scroll">
+        <div class="hdr">
+          <span class="wordmark">meesae</span>
+          <span class="seg"><i class="segi"></i><b class="on">추천</b><b>대화</b></span>
+          <span class="icb">${I.filter}<i class="dot"></i></span>
+          <span class="pill point">${I.gem}100P</span>
+          <span class="avatar"><i class="v"></i></span>
+        </div>
+
+        <div class="sec"><h3>추천 · 2열 + 스크림</h3>
+          <div class="grid">
+            ${card(ph1, '하늘', 22, ['성북구', '디자이너', 'ENFP'], true)}
+            ${card(ph2, '도윤', 25, ['송파구', '학생', 'ENTP'], false)}
+          </div>
+        </div>
+
+        <div class="sec"><h3>대화 목록 · 대화방</h3>
+          <div class="row"><span class="avatar lg"><i class="on"></i></span><div class="t"><b>하늘 <span class="pill primary">매치</span></b><small>반가워요! 안드로이드에서 잘 보이나요?</small></div><div class="r"><time>방금</time><span class="pill unread">3</span></div></div>
+          <div class="row"><span class="avatar lg"></span><div class="t"><b>서윤 <span class="pill neutral">종료</span></b><small>주말에 한강 러닝 같이 하실 분?</small></div><div class="r"><time>어제</time></div></div>
+          <div class="chat">
+            <span class="pill neutral day">오늘</span>
+            <div class="bub them">반가워요! 안드로이드에서 잘 보이나요?</div>
+            <div class="bub me">네, 다크모드가 훨씬 보기 편하네요</div>
+            <div class="bub me">주말에 성수동 어때요?</div>
+          </div>
+          <div class="inbar"><span class="in">메시지 보내기</span><span class="send">${I.up}</span></div>
+        </div>
+
+        <div class="sec"><h3>포인트</h3>
+          <div class="hero"><small>내 포인트</small><div class="big">100P</div>
+            <div class="pills"><span class="pill onPhoto">무료 첫 대화 9회</span><span class="pill onPhoto">오늘 좋아요 2회</span></div></div>
+          <div class="group">
+            <div class="lrow"><span class="ic">${I.cal}</span><div class="t"><b>출석 체크</b><small>하루 한 번 +10P</small></div><span class="btn sm primary">받기</span></div>
+            <div class="lrow"><span class="ic">${I.pin}</span><div class="t"><b>위치 인증</b><small>하루 한 번 +5P</small></div><span class="btn sm secondary">인증</span></div>
+            <div class="lrow"><span class="ic">${I.bolt}</span><div class="t"><b>부스트</b><small>30분 동안 맨 위에 보여요</small></div><span class="pill point">100P</span></div>
+          </div>
+        </div>
+
+        <div class="sec"><h3>버튼 · 눌림 · 비활성</h3>
+          <div class="btns">
+            <span class="btn primary press">좋아요</span><span class="btn grad">대화 시작</span>
+            <span class="btn secondary">대화</span><span class="btn ghost">건너뛰기</span>
+            <span class="btn danger">차단</span><span class="btn primary dis">보내기</span>
+          </div>
+          <div class="btns" style="margin-top:10px">
+            <span class="pill primary">선택됨</span><span class="pill accent">같은 나라</span><span class="pill neutral">ENFP</span>
+          </div>
+          <div style="display:grid;gap:8px;margin-top:12px"><span class="sk" style="width:70%"></span><span class="sk" style="width:45%"></span></div>
+        </div>
+
+        <div class="sec"><h3>텍스트 4단계 · 대비 (표면 위)</h3>
+          <div class="ladder">
+            <div><span style="color:var(--textStrong);font-weight:700">textStrong 제목 Aa</span>${cr(t.textStrong, t.s1, 4.5)}</div>
+            <div><span style="color:var(--text)">text 본문 Aa</span>${cr(t.text, t.s1, 4.5)}</div>
+            <div><span style="color:var(--muted);font-size:14px">textMuted 보조 Aa</span>${cr(t.muted, t.s1, 4.5)}</div>
+            <div><span style="color:var(--faint);font-size:12px">textFaint 힌트 Aa (UI 3:1)</span>${cr(t.faint, t.s1, 3)}</div>
+            <div><span style="background:var(--primaryFill);color:var(--onPrimary);padding:2px 10px;border-radius:99px;font-size:14px;font-weight:600">onPrimary / primaryFill</span>${cr(t.onPrimary, t.primaryFill, 4.5)}</div>
+            <div><span style="color:var(--primary);font-weight:600">primary 강조 (UI 3:1)</span>${cr(t.primary, t.bg, 3)}</div>
+            <div><span style="background:var(--pointSoft);color:var(--pointText);padding:2px 10px;border-radius:99px;font-size:12px;font-weight:600">pointText / pointSoft</span>${cr(t.pointText, t.pointSoft, 4.5)}</div>
+            <div><span style="background:var(--primarySoft);color:var(--onPrimarySoft);padding:2px 10px;border-radius:99px;font-size:12px;font-weight:600">onPrimarySoft / primarySoft</span>${cr(t.onPrimarySoft, t.primarySoft, 4.5)}</div>
+          </div>
+          <div style="height:24px"></div>
+        </div>
+      </div>
+
+      <div class="tabbar">
+        <div class="tab on"><span class="ico">${I.chat}<span class="badge">3</span></span>대화</div>
+        <div class="tab"><span class="ico">${I.map}</span>지도</div>
+        <div class="tab"><span class="ico">${I.news}</span>피드</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ── URL 쿼리 · 렌더 ─────────────────────────────────────────── */
+const q = new URLSearchParams(location.search);
+const want = q.get('variant') || 'all';
+const scheme = q.get('scheme') === 'light' ? 'light' : 'dark';
+const keys = want === 'all' ? Object.keys(VARIANTS) : want.split(',').filter(k => VARIANTS[k]);
+document.getElementById('frames').innerHTML = keys.map(k => frame(k, scheme)).join('');
+document.querySelectorAll('.bar a').forEach(a => {
+  const u = new URL(a.href); u.searchParams.set('variant', a.dataset.v ?? want); u.searchParams.set('scheme', a.dataset.s ?? scheme);
+  if (q.get('hold')) u.searchParams.set('hold', q.get('hold'));
+  a.href = u.search; a.classList.toggle('on', a.dataset.v === want || a.dataset.s === scheme);
+});
+
+/* ── 시계는 하나. progress 0→1 이 모든 움직임을 정한다 (card-fx 방식) ── */
+const seg = (p, a, b) => Math.min(1, Math.max(0, (p - a) / (b - a)));
+const ease = x => x < .5 ? 2*x*x : 1 - (-2*x + 2) ** 2 / 2;
+function render(p) {
+  document.documentElement.style.setProperty('--press', 1 - 0.04 * Math.sin(Math.PI * seg(p, 0, .35)));
+  const tabX = ease(seg(p, .2, .45)) - ease(seg(p, .7, .95));          // 추천 → 대화 → 추천
+  document.querySelectorAll('.segi').forEach(el => el.style.transform = `translateX(${tabX * 100}%)`);
+  document.querySelectorAll('.seg b').forEach((b, i) => b.classList.toggle('on', (i % 2 === 1) === (tabX > .5)));
+  document.documentElement.style.setProperty('--shim', `${100 - p * 200}%`);
+  const pop = 1 + 0.25 * Math.sin(Math.PI * seg(p, .5, .62));          // 좋아요 하트 팝
+  document.querySelectorAll('.rb.like').forEach(el => el.style.transform = `scale(${pop})`);
+  document.getElementById('pv').textContent = p.toFixed(2);
+  document.getElementById('hold').value = p;
+}
+const DUR = 2400; let playing = !q.get('hold'); let t0 = performance.now(); let held = Number(q.get('hold') || 0);
+function loop(now) { if (playing) { const p = ((now - t0) % DUR) / DUR; held = p; render(p); } requestAnimationFrame(loop); }
+render(held); requestAnimationFrame(loop);
+document.getElementById('hold').addEventListener('input', e => { playing = false; held = Number(e.target.value); render(held); });
+document.getElementById('play').addEventListener('click', () => { playing = !playing; t0 = performance.now() - held * DUR; });
+window.__proto = { render, set hold(v) { playing = false; held = v; render(v); } };
+</script>
+</body>
+</html>

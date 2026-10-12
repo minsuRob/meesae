@@ -1,0 +1,527 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="theme-color" content="#f3f2ef" />
+<title>meesae 라이트 디자인 방향 4종</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600&display=swap" />
+<style>
+  /* ── 페이지 (시안 바깥) ─────────────────────────────────────── */
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: #f3f2ef; color: #2a2a2a; font-family: "Pretendard Variable", Pretendard, -apple-system, system-ui, sans-serif; }
+  .bar { display: flex; gap: 10px; align-items: center; padding: 14px 20px; font-size: 13px; color: #666; flex-wrap: wrap; border-bottom: 1px solid #e3e1dc; background: #fff; }
+  .bar a { color: #222; background: #fff; border: 1px solid #d8d6d0; border-radius: 999px; padding: 5px 12px; text-decoration: none; }
+  .bar a.on { background: #111; color: #fff; border-color: #111; }
+  .cols { display: flex; gap: 28px; padding: 20px; overflow-x: auto; align-items: flex-start; }
+  .col { flex: 0 0 375px; display: grid; gap: 14px; }
+  .col h2 { font-size: 16px; margin: 0; }
+  .col .desc { font-size: 12.5px; line-height: 18px; color: #666; margin: 0 0 4px; min-height: 72px; }
+  .col .desc b { color: #222; }
+
+  /* ── 폰 프레임 공통 뼈대 (모양은 전부 변형별 변수) ──────────── */
+  .frame { width: 375px; height: 812px; border-radius: 36px; overflow: hidden; position: relative; background: var(--bg); color: var(--ink);
+    font-size: 16px; line-height: 1.5; box-shadow: 0 0 0 1px rgba(0,0,0,.06), 0 12px 32px rgba(40,36,30,.10); touch-action: manipulation; --tabH: 76px; }
+  .frame button { font: inherit; color: inherit; border: 0; background: none; padding: 0; margin: 0; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+  .frame button:focus-visible, .frame [tabindex]:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .frame .num { font-variant-numeric: tabular-nums; }
+  .frame h1, .frame h2, .frame h3 { margin: 0; text-wrap: balance; }
+  .frame img { display: block; width: 100%; height: 100%; object-fit: cover; background: var(--s2); }
+  .scroll { position: absolute; inset: 0 0 var(--tabH, 76px) 0; overflow-y: auto; scrollbar-width: none; }
+  .scroll::-webkit-scrollbar { display: none; }
+  .status { height: 44px; }
+  .tabbar { position: absolute; left: 0; right: 0; bottom: 0; height: var(--tabH, 76px); display: flex; padding: 8px 0 18px; background: var(--tabBg); border-top: 1px solid var(--tabLine); }
+  .tab { flex: 1; display: grid; justify-items: center; align-content: center; gap: 3px; font-size: 11px; font-weight: 500; color: var(--mute); min-height: 44px; }
+  .tab.on { color: var(--tabOn); }
+  .tab svg { width: 24px; height: 24px; }
+  svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; width: 20px; height: 20px; flex: 0 0 auto; }
+  .ic { width: 20px; height: 20px; }
+  .row-between { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+  /* ════════════════════════════════════════════════════════════════
+     PIN · Pinterest 형 (design-md/pinterest)
+     크림 중립 + 빨강 1색, radius 16 통일, 그림자 없음, 메이슨리 8px
+     ════════════════════════════════════════════════════════════════ */
+  [data-v=pin] { --bg:#fbfbf9; --s1:#ffffff; --s2:#f6f6f3; --s3:#e5e5e0; --ink:#000; --body:#33332e; --mute:#62625b; --ash:#91918c;
+    --line:#dadad3; --primary:#e60023; --primaryDown:#cc001f; --focus:#435ee5; --tabBg:#fff; --tabLine:#dadad3; --tabOn:#e60023; --r:16px; }
+  [data-v=pin] .hdr { padding: 6px 16px 10px; background: var(--s1); }
+  [data-v=pin] .logo { font-weight: 800; font-size: 24px; letter-spacing: -1.2px; color: var(--primary); }
+  [data-v=pin] .search { margin-top: 12px; height: 48px; border-radius: 9999px; background: var(--s2); display: flex; align-items: center; gap: 10px; padding: 0 16px; color: var(--ash); font-size: 16px; }
+  [data-v=pin] .chips { display: flex; gap: 8px; padding: 12px 16px 4px; overflow-x: auto; scrollbar-width: none; }
+  [data-v=pin] .chip { flex: 0 0 auto; height: 40px; padding: 0 16px; border-radius: 9999px; background: var(--s2); font-size: 14px; font-weight: 700; display: inline-flex; align-items: center; }
+  [data-v=pin] .chip.on { background: var(--ink); color: #fff; }
+  [data-v=pin] .masonry { columns: 2; column-gap: 8px; padding: 8px 8px 24px; }
+  [data-v=pin] .pin { break-inside: avoid; margin-bottom: 8px; border-radius: var(--r); overflow: hidden; position: relative; background: var(--s2); }
+  [data-v=pin] .pin .ov { position: absolute; left: 10px; bottom: 10px; right: 10px; display: flex; justify-content: space-between; align-items: flex-end; gap: 6px; }
+  [data-v=pin] .pill { background: #fff; color: #000; font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 9999px; display: inline-flex; gap: 4px; align-items: center; line-height: 1.2; }
+  [data-v=pin] .pill .vv { width: 12px; height: 12px; stroke-width: 3; }
+  [data-v=pin] .pin .likebtn { width: 40px; height: 40px; padding: 0; justify-content: center; }
+  [data-v=pin] .pin .likebtn svg { width: 18px; height: 18px; stroke-width: 2; }
+  [data-v=pin] .pin .likebtn:active { background: var(--s3); }
+  [data-v=pin] .pin .meta { position: absolute; left: 10px; top: 10px; }
+  [data-v=pin] .pin .meta .pill { padding: 5px 10px; font-size: 11px; }
+  /* 대화방 */
+  [data-v=pin] .chdr { display: flex; align-items: center; gap: 12px; padding: 4px 12px 10px; background: var(--s1); border-bottom: 1px solid var(--line); }
+  [data-v=pin] .iconbtn { width: 40px; height: 40px; border-radius: 9999px; background: var(--s2); display: grid; place-items: center; }
+  [data-v=pin] .av { width: 36px; height: 36px; border-radius: 9999px; overflow: hidden; }
+  [data-v=pin] .msgs { padding: 16px 12px; display: grid; gap: 6px; }
+  [data-v=pin] .day { justify-self: center; font-size: 12px; font-weight: 500; color: var(--mute); margin: 8px 0; }
+  [data-v=pin] .bub { max-width: 78%; padding: 10px 14px; border-radius: var(--r); font-size: 15px; line-height: 1.4; }
+  [data-v=pin] .bub.them { background: var(--s2); color: var(--body); justify-self: start; }
+  [data-v=pin] .bub.me { background: var(--ink); color: #fff; justify-self: end; }
+  [data-v=pin] .inbar { position: absolute; left: 0; right: 0; bottom: var(--tabH); padding: 10px 12px; background: var(--s1); border-top: 1px solid var(--line); display: flex; gap: 8px; align-items: center; }
+  [data-v=pin] .inbar .in { flex: 1; height: 48px; border-radius: 9999px; background: var(--s2); color: var(--ash); padding: 0 16px; display: flex; align-items: center; }
+  [data-v=pin] .inbar .send { width: 40px; height: 40px; border-radius: 9999px; background: var(--primary); color: #fff; display: grid; place-items: center; }
+  /* 포인트·설정 */
+  [data-v=pin] .page { padding: 4px 16px 24px; display: grid; gap: 24px; }
+  [data-v=pin] .h1 { font-size: 28px; font-weight: 700; letter-spacing: -1.2px; line-height: 1.2; }
+  [data-v=pin] .feature { background: var(--s2); border-radius: var(--r); padding: 24px; }
+  [data-v=pin] .feature .big { font-size: 44px; font-weight: 700; letter-spacing: -0.8px; line-height: 1.15; }
+  [data-v=pin] .feature .sub { color: var(--mute); font-size: 14px; margin-top: 6px; }
+  [data-v=pin] .h3 { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+  [data-v=pin] .lrow { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+  [data-v=pin] .lrow:last-child { border-bottom: 0; }
+  [data-v=pin] .lrow .t { flex: 1; } [data-v=pin] .lrow .t b { display: block; font-size: 16px; font-weight: 600; } [data-v=pin] .lrow .t small { color: var(--mute); font-size: 14px; }
+  [data-v=pin] .btn { height: 40px; padding: 0 14px; border-radius: 16px; font-size: 14px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; }
+  [data-v=pin] .btn.p { background: var(--primary); color: #fff; } [data-v=pin] .btn.p:active { background: var(--primaryDown); }
+  [data-v=pin] .btn.s { background: var(--s3); color: #000; } [data-v=pin] .btn.s:active { background: #c8c8c1; }
+  [data-v=pin] .btn.dis { background: var(--s2); color: var(--ash); }
+  [data-v=pin] .price { font-size: 14px; font-weight: 700; }
+
+  /* ════════════════════════════════════════════════════════════════
+     AIR · Airbnb 형 (design-md/airbnb)
+     흰 캔버스 + 잉크 #222 + Rausch 1색(CTA·하트), 카드 14 / 버튼 8 / 알약, 그림자 1단계만
+     ════════════════════════════════════════════════════════════════ */
+  [data-v=air] { --bg:#fff; --s1:#fff; --s2:#f7f7f7; --s3:#f2f2f2; --ink:#222; --body:#3f3f3f; --mute:#6a6a6a; --line:#ddd; --lineSoft:#ebebeb;
+    --primary:#ff385c; --primaryDown:#e00b41; --focus:#222; --tabBg:#fff; --tabLine:#ebebeb; --tabOn:#ff385c;
+    --shadow: rgba(0,0,0,.02) 0 0 0 1px, rgba(0,0,0,.04) 0 2px 6px 0, rgba(0,0,0,.10) 0 4px 8px 0; }
+  [data-v=air] .hdr { padding: 6px 16px 0; }
+  [data-v=air] .search { height: 56px; border-radius: 9999px; background: #fff; box-shadow: var(--shadow); display: flex; align-items: center; gap: 12px; padding: 0 8px 0 18px; }
+  [data-v=air] .search .t { flex: 1; } [data-v=air] .search .t b { display: block; font-size: 14px; font-weight: 600; } [data-v=air] .search .t small { font-size: 12px; color: var(--mute); }
+  [data-v=air] .orb { width: 40px; height: 40px; border-radius: 9999px; background: var(--s3); display: grid; place-items: center; }
+  [data-v=air] .ptabs { display: flex; gap: 20px; padding: 18px 16px 0; border-bottom: 1px solid var(--lineSoft); margin: 0 0 16px; }
+  [data-v=air] .ptab { padding: 0 2px 12px; font-size: 14px; font-weight: 500; color: var(--mute); border-bottom: 2px solid transparent; }
+  [data-v=air] .ptab.on { color: var(--ink); border-color: var(--ink); font-weight: 600; }
+  [data-v=air] .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px 16px; padding: 0 16px 24px; }
+  [data-v=air] .card .ph { aspect-ratio: 4/5; border-radius: 14px; overflow: hidden; position: relative; }
+  [data-v=air] .card .heart { position: absolute; top: 10px; right: 10px; width: 32px; height: 32px; display: grid; place-items: center; color: #fff; }
+  [data-v=air] .card .heart svg { width: 24px; height: 24px; fill: rgba(0,0,0,.5); stroke: #fff; stroke-width: 2; }
+  [data-v=air] .card .badge { position: absolute; top: 10px; left: 10px; background: #fff; border-radius: 9999px; padding: 4px 10px; font-size: 11px; font-weight: 600; color: var(--ink); }
+  [data-v=air] .card .cap { padding-top: 10px; }
+  [data-v=air] .card .cap b { font-size: 16px; font-weight: 600; display: flex; justify-content: space-between; align-items: baseline; }
+  [data-v=air] .card .cap b span { font-size: 14px; font-weight: 400; display: inline-flex; gap: 3px; align-items: center; }
+  [data-v=air] .card .cap small { display: block; color: var(--mute); font-size: 14px; line-height: 1.43; }
+  [data-v=air] .card .cap em { font-style: normal; font-size: 14px; color: var(--ink); text-decoration: underline; text-underline-offset: 2px; }
+  /* 대화방 */
+  [data-v=air] .chdr { display: flex; align-items: center; gap: 12px; padding: 4px 16px 12px; border-bottom: 1px solid var(--lineSoft); }
+  [data-v=air] .iconbtn { width: 40px; height: 40px; border-radius: 9999px; display: grid; place-items: center; }
+  [data-v=air] .av { width: 40px; height: 40px; border-radius: 9999px; overflow: hidden; }
+  [data-v=air] .msgs { padding: 20px 16px; display: grid; gap: 8px; }
+  [data-v=air] .day { justify-self: center; font-size: 12px; color: var(--mute); margin: 4px 0 8px; }
+  [data-v=air] .bub { max-width: 78%; padding: 12px 16px; border-radius: 20px; font-size: 16px; line-height: 1.4; }
+  [data-v=air] .bub.them { background: var(--s2); color: var(--ink); justify-self: start; border-bottom-left-radius: 8px; }
+  [data-v=air] .bub.me { background: var(--ink); color: #fff; justify-self: end; border-bottom-right-radius: 8px; }
+  [data-v=air] .inbar { position: absolute; left: 0; right: 0; bottom: var(--tabH); padding: 12px 16px; background: #fff; border-top: 1px solid var(--lineSoft); display: flex; gap: 10px; align-items: center; }
+  [data-v=air] .inbar .in { flex: 1; height: 48px; border-radius: 8px; border: 1px solid var(--line); color: var(--mute); padding: 0 14px; display: flex; align-items: center; }
+  [data-v=air] .inbar .send { height: 48px; padding: 0 18px; border-radius: 8px; background: var(--primary); color: #fff; font-weight: 500; }
+  /* 포인트·설정 */
+  [data-v=air] .page { padding: 4px 16px 24px; display: grid; gap: 28px; }
+  [data-v=air] .h1 { font-size: 28px; font-weight: 700; line-height: 1.3; }
+  [data-v=air] .feature { border: 1px solid var(--line); border-radius: 14px; padding: 24px; }
+  [data-v=air] .feature .big { font-size: 40px; font-weight: 700; letter-spacing: -1px; line-height: 1.1; }
+  [data-v=air] .feature .sub { color: var(--mute); font-size: 14px; margin-top: 8px; }
+  [data-v=air] .h3 { font-size: 20px; font-weight: 600; letter-spacing: -0.18px; margin-bottom: 4px; }
+  [data-v=air] .lrow { display: flex; align-items: center; gap: 14px; padding: 16px 0; border-bottom: 1px solid var(--lineSoft); }
+  [data-v=air] .lrow:last-child { border-bottom: 0; }
+  [data-v=air] .lrow .t { flex: 1; } [data-v=air] .lrow .t b { display: block; font-size: 16px; font-weight: 500; } [data-v=air] .lrow .t small { color: var(--mute); font-size: 14px; }
+  [data-v=air] .btn { height: 40px; padding: 0 16px; border-radius: 8px; font-size: 14px; font-weight: 500; display: inline-flex; align-items: center; justify-content: center; }
+  [data-v=air] .btn.p { background: var(--primary); color: #fff; } [data-v=air] .btn.p:active { background: var(--primaryDown); }
+  [data-v=air] .btn.s { background: #fff; color: var(--ink); border: 1px solid var(--ink); }
+  [data-v=air] .btn.dis { background: #ffd1da; color: #fff; }
+  [data-v=air] .price { font-size: 16px; font-weight: 500; }
+  [data-v=air] .big-cta { height: 48px; border-radius: 8px; background: var(--primary); color: #fff; font-size: 16px; font-weight: 500; width: 100%; }
+
+  /* ════════════════════════════════════════════════════════════════
+     APL · Apple HIG 형 (design-md/apple)
+     양피지 #f5f5f7 + 흰 그룹 카드 18, 상호작용은 파랑 1색, 17px 본문, pill CTA, 그림자 없음
+     ════════════════════════════════════════════════════════════════ */
+  [data-v=apl] { --bg:#f5f5f7; --s1:#fff; --s2:#f5f5f7; --s3:rgba(210,210,215,.64); --ink:#1d1d1f; --body:#1d1d1f; --mute:#6e6e73; --mute2:#86868b; --line:rgba(0,0,0,.08);
+    --primary:#0066cc; --primaryDown:#0055aa; --focus:#0071e3; --tabBg:rgba(245,245,247,.86); --tabLine:rgba(0,0,0,.08); --tabOn:#0066cc; letter-spacing: -0.374px; }
+  [data-v=apl] .tabbar { backdrop-filter: saturate(180%) blur(20px); }
+  [data-v=apl] .hdr { padding: 0 20px 8px; }
+  [data-v=apl] .large { font-size: 34px; font-weight: 600; letter-spacing: -0.374px; line-height: 1.2; padding-top: 4px; }
+  [data-v=apl] .chips { display: flex; gap: 8px; padding: 12px 20px 4px; overflow-x: auto; scrollbar-width: none; }
+  [data-v=apl] .chip { flex: 0 0 auto; height: 40px; padding: 0 16px; border-radius: 9999px; background: #fff; font-size: 14px; display: inline-flex; align-items: center; border: 1px solid transparent; letter-spacing: -0.224px; }
+  [data-v=apl] .chip.on { border: 2px solid var(--focus); }
+  [data-v=apl] .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 12px 20px 24px; }
+  [data-v=apl] .card { background: #fff; border-radius: 18px; padding: 10px 10px 14px; }
+  [data-v=apl] .card .ph { aspect-ratio: 1/1; border-radius: 8px; overflow: hidden; position: relative; }
+  [data-v=apl] .card .heart { position: absolute; right: 8px; bottom: 8px; width: 44px; height: 44px; border-radius: 50%; background: var(--s3); backdrop-filter: blur(10px); display: grid; place-items: center; color: var(--ink); }
+  [data-v=apl] .card .cap { padding: 10px 4px 0; }
+  [data-v=apl] .card .cap b { font-size: 17px; font-weight: 600; display: block; }
+  [data-v=apl] .card .cap small { display: block; color: var(--mute); font-size: 14px; letter-spacing: -0.224px; line-height: 1.43; }
+  [data-v=apl] .card .cap a { color: var(--primary); font-size: 14px; letter-spacing: -0.224px; margin-top: 6px; display: inline-block; text-decoration: none; }
+  /* 대화방 */
+  [data-v=apl] .chdr { display: flex; align-items: center; gap: 10px; padding: 0 12px 10px; background: var(--tabBg); backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid var(--line); }
+  [data-v=apl] .iconbtn { width: 44px; height: 44px; display: grid; place-items: center; color: var(--primary); }
+  [data-v=apl] .av { width: 36px; height: 36px; border-radius: 9999px; overflow: hidden; }
+  [data-v=apl] .msgs { padding: 16px 16px; display: grid; gap: 4px; }
+  [data-v=apl] .day { justify-self: center; font-size: 12px; color: var(--mute2); margin: 8px 0; letter-spacing: -0.12px; }
+  [data-v=apl] .bub { max-width: 75%; padding: 9px 14px; border-radius: 18px; font-size: 17px; line-height: 1.3; }
+  [data-v=apl] .bub.them { background: #e9e9eb; color: var(--ink); justify-self: start; }
+  [data-v=apl] .bub.me { background: var(--primary); color: #fff; justify-self: end; }
+  [data-v=apl] .bub.me + .bub.me { border-top-right-radius: 6px; }
+  [data-v=apl] .inbar { position: absolute; left: 0; right: 0; bottom: var(--tabH); padding: 8px 12px; background: var(--tabBg); backdrop-filter: saturate(180%) blur(20px); border-top: 1px solid var(--line); display: flex; gap: 8px; align-items: center; }
+  [data-v=apl] .inbar .in { flex: 1; height: 44px; border-radius: 9999px; border: 1px solid var(--line); background: #fff; color: var(--mute2); padding: 0 16px; display: flex; align-items: center; font-size: 17px; }
+  [data-v=apl] .inbar .send { width: 36px; height: 36px; border-radius: 9999px; background: var(--primary); color: #fff; display: grid; place-items: center; }
+  /* 포인트·설정 (iOS 그룹 리스트) */
+  [data-v=apl] .page { padding: 4px 20px 24px; display: grid; gap: 24px; }
+  [data-v=apl] .feature { background: #fff; border-radius: 18px; padding: 24px; }
+  [data-v=apl] .feature .big { font-size: 40px; font-weight: 600; letter-spacing: -0.5px; line-height: 1.1; }
+  [data-v=apl] .feature .sub { color: var(--mute); font-size: 14px; margin-top: 8px; letter-spacing: -0.224px; }
+  [data-v=apl] .h3 { font-size: 13px; font-weight: 400; color: var(--mute); text-transform: none; padding: 0 16px 6px; letter-spacing: -0.08px; }
+  [data-v=apl] .group { background: #fff; border-radius: 18px; padding: 0 16px; }
+  [data-v=apl] .lrow { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); min-height: 52px; }
+  [data-v=apl] .lrow:last-child { border-bottom: 0; }
+  [data-v=apl] .lrow .t { flex: 1; } [data-v=apl] .lrow .t b { display: block; font-size: 17px; font-weight: 400; } [data-v=apl] .lrow .t small { color: var(--mute); font-size: 14px; letter-spacing: -0.224px; }
+  [data-v=apl] .lrow .val { color: var(--mute); font-size: 17px; display: inline-flex; gap: 6px; align-items: center; }
+  [data-v=apl] .btn { height: 36px; padding: 0 16px; border-radius: 9999px; font-size: 15px; font-weight: 400; display: inline-flex; align-items: center; justify-content: center; letter-spacing: -0.2px; }
+  [data-v=apl] .btn.p { background: var(--primary); color: #fff; } [data-v=apl] .btn.p:active { transform: scale(.95); }
+  [data-v=apl] .btn.s { background: #fff; color: var(--primary); border: 1px solid var(--primary); }
+  [data-v=apl] .btn.dis { background: var(--s2); color: #7a7a7a; }
+  [data-v=apl] .btn.util { background: var(--ink); color: #fff; border-radius: 8px; height: 34px; font-size: 14px; }
+  [data-v=apl] .price { font-size: 17px; color: var(--mute); }
+
+  /* ════════════════════════════════════════════════════════════════
+     NTN · Notion 에디토리얼 형 (design-md/notion + minimalist-ui)
+     흰 캔버스 + #f6f5f4 표면, 1px #e5e3df, 버튼 8 / 카드 12, 검정 CTA, 파스텔 태그, 세리프는 질문 제목에만
+     ════════════════════════════════════════════════════════════════ */
+  [data-v=ntn] { --bg:#fff; --s1:#fff; --s2:#f6f5f4; --s3:#f0eeec; --ink:#1a1a1a; --body:#37352f; --mute:#787671; --stone:#a4a097; --line:#e5e3df; --lineStrong:#c8c4be;
+    --primary:#000; --primaryDown:#333; --focus:#5645d4; --tabBg:#fff; --tabLine:#e5e3df; --tabOn:#1a1a1a; }
+  [data-v=ntn] .hdr { padding: 4px 20px 0; }
+  [data-v=ntn] .hdr .top { display: flex; justify-content: space-between; align-items: center; }
+  [data-v=ntn] .logo { font-weight: 700; font-size: 20px; letter-spacing: -0.5px; }
+  [data-v=ntn] .ptabs { display: flex; gap: 8px; padding: 14px 0 0; }
+  [data-v=ntn] .ptab { height: 36px; padding: 0 16px; border-radius: 9999px; border: 1px solid var(--line); color: var(--mute); font-size: 14px; font-weight: 500; display: inline-flex; align-items: center; }
+  [data-v=ntn] .ptab.on { background: #000; color: #fff; border-color: #000; }
+  [data-v=ntn] .question { margin: 16px 20px 0; background: #fef7d6; border-radius: 12px; padding: 18px 18px 16px; }
+  [data-v=ntn] .question small { font-size: 12px; font-weight: 600; color: #956400; letter-spacing: .3px; }
+  [data-v=ntn] .question h2 { font-family: "Noto Serif KR", "Pretendard Variable", serif; font-weight: 600; font-size: 20px; line-height: 1.4; letter-spacing: -0.3px; margin-top: 6px; color: var(--body); }
+  [data-v=ntn] .question .ans { display: flex; gap: 8px; margin-top: 12px; align-items: center; font-size: 13px; color: var(--mute); }
+  [data-v=ntn] .question .ans i { width: 10px; height: 10px; border-radius: 99px; border: 1.5px solid #c9b45a; display: inline-block; }
+  [data-v=ntn] .question .ans i.on { background: #f5d75e; border-color: #f5d75e; }
+  [data-v=ntn] .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 16px 20px 24px; }
+  [data-v=ntn] .card { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: #fff; }
+  [data-v=ntn] .card .ph { aspect-ratio: 1/1; position: relative; }
+  [data-v=ntn] .card .cap { padding: 10px 12px 12px; }
+  [data-v=ntn] .card .cap b { font-size: 15px; font-weight: 600; display: flex; gap: 4px; align-items: center; }
+  [data-v=ntn] .card .cap b span { font-weight: 400; color: var(--mute); font-size: 13px; }
+  [data-v=ntn] .card .tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+  [data-v=ntn] .tag { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 6px; line-height: 1.5; }
+  [data-v=ntn] .tag.lav { background: #e6e0f5; color: #391c57; } [data-v=ntn] .tag.mint { background: #d9f3e1; color: #1e6b32; } [data-v=ntn] .tag.peach { background: #ffe8d4; color: #793400; } [data-v=ntn] .tag.sky { background: #dcecfa; color: #1f4d7a; } [data-v=ntn] .tag.gray { background: var(--s3); color: var(--body); }
+  [data-v=ntn] .card .act { display: flex; gap: 6px; margin-top: 10px; }
+  [data-v=ntn] .btn { height: 34px; padding: 0 12px; border-radius: 8px; font-size: 14px; font-weight: 500; display: inline-flex; align-items: center; justify-content: center; }
+  [data-v=ntn] .btn.p { background: var(--primary); color: #fff; } [data-v=ntn] .btn.p:active { background: var(--primaryDown); }
+  [data-v=ntn] .btn.s { background: transparent; color: var(--ink); border: 1px solid var(--lineStrong); }
+  [data-v=ntn] .btn.dis { background: var(--line); color: #bbb8b1; }
+  [data-v=ntn] .card .act .btn { flex: 1; }
+  /* 대화방 */
+  [data-v=ntn] .chdr { display: flex; align-items: center; gap: 10px; padding: 4px 12px 12px; border-bottom: 1px solid var(--line); }
+  [data-v=ntn] .iconbtn { width: 40px; height: 40px; border-radius: 8px; display: grid; place-items: center; }
+  [data-v=ntn] .av { width: 36px; height: 36px; border-radius: 8px; overflow: hidden; }
+  [data-v=ntn] .msgs { padding: 20px 16px; display: grid; gap: 8px; }
+  [data-v=ntn] .day { justify-self: center; font-size: 12px; font-weight: 500; color: var(--stone); margin: 4px 0 8px; }
+  [data-v=ntn] .bub { max-width: 78%; padding: 10px 14px; border-radius: 12px; font-size: 15px; line-height: 1.5; }
+  [data-v=ntn] .bub.them { background: var(--s2); color: var(--body); justify-self: start; }
+  [data-v=ntn] .bub.me { background: #000; color: #fff; justify-self: end; }
+  [data-v=ntn] .inbar { position: absolute; left: 0; right: 0; bottom: var(--tabH); padding: 12px 16px; background: #fff; border-top: 1px solid var(--line); display: flex; gap: 8px; align-items: center; }
+  [data-v=ntn] .inbar .in { flex: 1; height: 44px; border-radius: 8px; border: 1px solid var(--lineStrong); color: var(--stone); padding: 0 14px; display: flex; align-items: center; font-size: 15px; }
+  [data-v=ntn] .inbar .send { width: 44px; height: 44px; border-radius: 8px; background: #000; color: #fff; display: grid; place-items: center; }
+  /* 포인트·설정 */
+  [data-v=ntn] .page { padding: 4px 20px 24px; display: grid; gap: 24px; }
+  [data-v=ntn] .h1 { font-size: 28px; font-weight: 600; letter-spacing: -0.5px; line-height: 1.25; }
+  [data-v=ntn] .feature { background: #f9e79f; border-radius: 12px; padding: 20px; }
+  [data-v=ntn] .feature .big { font-size: 36px; font-weight: 600; letter-spacing: -0.5px; line-height: 1.2; color: var(--body); }
+  [data-v=ntn] .feature .sub { color: #5d5b54; font-size: 13px; margin-top: 6px; }
+  [data-v=ntn] .h3 { font-size: 13px; font-weight: 600; color: var(--mute); margin-bottom: 6px; }
+  [data-v=ntn] .group { border: 1px solid var(--line); border-radius: 12px; padding: 0 16px; }
+  [data-v=ntn] .lrow { display: flex; align-items: center; gap: 12px; padding: 13px 0; border-bottom: 1px solid var(--line); }
+  [data-v=ntn] .lrow:last-child { border-bottom: 0; }
+  [data-v=ntn] .lrow .t { flex: 1; } [data-v=ntn] .lrow .t b { display: block; font-size: 15px; font-weight: 500; } [data-v=ntn] .lrow .t small { color: var(--mute); font-size: 13px; }
+  [data-v=ntn] .lrow .val { color: var(--mute); font-size: 14px; display: inline-flex; gap: 6px; align-items: center; }
+  [data-v=ntn] .price { font-size: 13px; font-weight: 600; padding: 2px 8px; border-radius: 6px; background: var(--s3); }
+
+  @media (prefers-reduced-motion: no-preference) { .frame .btn, .frame .send, .frame .like { transition: background-color 150ms ease, transform 150ms ease; } }
+</style>
+</head>
+<body>
+<div class="bar">
+  <strong style="color:#111">meesae 라이트 디자인 방향 4종</strong>
+  <span>보기:</span>
+  <a href="?variant=all" data-v="all">전부</a><a href="?variant=pin" data-v="pin">1 Pinterest</a><a href="?variant=air" data-v="air">2 Airbnb</a><a href="?variant=apl" data-v="apl">3 Apple</a><a href="?variant=ntn" data-v="ntn">4 Notion</a>
+  <span style="margin-left:auto">사진은 picsum 임시 이미지. 각 안은 awesome-design-md 의 DESIGN.md 값을 그대로 썼고, 수치·문구는 앱 실제 데이터 형식을 따른 예시입니다.</span>
+</div>
+<div class="cols" id="cols"></div>
+
+<script>
+const P = (seed, w, h) => `https://picsum.photos/seed/${seed}/${w}/${h}`;
+const PEOPLE = [
+  { n: '하늘', a: 22, r: '성북구', j: '디자이너', m: 'ENFP', on: true,  s: 'ms-a' },
+  { n: '도윤', a: 25, r: '송파구', j: '학생',     m: 'ENTP', on: false, s: 'ms-b' },
+  { n: '서윤', a: 34, r: '마포구', j: '큐레이터', m: 'INFJ', on: true,  s: 'ms-c' },
+  { n: '예준', a: 28, r: '강남구', j: '개발자',   m: 'ISTP', on: false, s: 'ms-d' },
+  { n: '지우', a: 27, r: '용산구', j: '간호사',   m: 'ESFJ', on: false, s: 'ms-e' },
+  { n: '민재', a: 31, r: '성동구', j: '바리스타', m: 'ENFP', on: true,  s: 'ms-f' },
+];
+const I = {
+  heart: '<svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>',
+  up: '<svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg>',
+  back: '<svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>',
+  more: '<svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="19" cy="12" r="1.2"/></svg>',
+  search: '<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>',
+  filter: '<svg viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4"/></svg>',
+  chat: '<svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-8 8H5l-2 2V12a8 8 0 0 1 8-8h2a8 8 0 0 1 8 8z"/></svg>',
+  map: '<svg viewBox="0 0 24 24"><path d="M1 6v16l7-4 8 4 7-4V2l-7 4-8-4-7 4z"/><path d="M8 2v16M16 6v16"/></svg>',
+  news: '<svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>',
+  check: '<svg viewBox="0 0 24 24"><path d="M5 12l4 4L19 6"/></svg>',
+  chev: '<svg viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M9 6l6 6-6 6"/></svg>',
+  cal: '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M8 2v4M16 2v4M3 10h18"/></svg>',
+  pin: '<svg viewBox="0 0 24 24"><path d="M12 22s7-7 7-12a7 7 0 1 0-14 0c0 5 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>',
+  bolt: '<svg viewBox="0 0 24 24"><path d="M13 2L3 14h8l-1 8 10-12h-8l1-8z"/></svg>',
+  star: '<svg viewBox="0 0 24 24"><path d="M12 3l2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/></svg>',
+  globe: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>',
+  moon: '<svg viewBox="0 0 24 24"><path d="M21 13A8.5 8.5 0 0 1 11 3a8.5 8.5 0 1 0 10 10z"/></svg>',
+  phone: '<svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>',
+};
+const tabbar = (on = 0) => `
+  <nav class="tabbar" aria-label="메인">
+    <button class="tab ${on===0?'on':''}" aria-current="${on===0?'page':'false'}">${I.chat}대화</button>
+    <button class="tab ${on===1?'on':''}">${I.map}지도</button>
+    <button class="tab ${on===2?'on':''}">${I.news}피드</button>
+  </nav>`;
+const img = (seed, w, h, alt) => `<img src="${P(seed, w, h)}" width="${w}" height="${h}" alt="${alt}" loading="lazy" />`;
+const CHAT = (them) => `
+  <div class="msgs">
+    <span class="day">오늘</span>
+    <div class="bub them">반가워요! 성수동 카페 투어 좋아하세요?</div>
+    <div class="bub me">네, 지난주에 갔던 곳 하나 추천할게요</div>
+    <div class="bub me">토요일 오후 괜찮으세요?</div>
+    <div class="bub them">좋아요, 3시쯤 어때요?</div>
+    <div class="bub them">저는 성수역 근처가 편해요</div>
+    <div class="bub me">그럼 성수역 3번 출구에서 봬요</div>
+    <div style="height:72px"></div>
+  </div>`;
+
+/* ── 1. Pinterest ─────────────────────────────────────────────── */
+const pinHome = () => `
+  <div class="frame" data-v="pin"><div class="scroll">
+    <div class="status"></div>
+    <header class="hdr">
+      <div class="row-between"><span class="logo">meesae</span><button class="iconbtn" aria-label="필터">${I.filter}</button></div>
+      <div class="search">${I.search}<span>동네, 직업, MBTI 검색</span></div>
+    </header>
+    <div class="chips"><span class="chip on">전체</span><span class="chip">근처</span><span class="chip">접속 중</span><span class="chip">ENFP</span><span class="chip">20대</span></div>
+    <div class="masonry">
+      ${[[0,400,560],[1,400,440],[2,400,500],[3,400,400],[4,400,600],[5,400,460]].map(([i,w,h]) => { const p = PEOPLE[i]; return `
+      <article class="pin"><div style="aspect-ratio:${w}/${h}">${img(p.s, w, h, p.n + ' 프로필 사진')}</div>
+        ${p.on ? `<div class="meta"><span class="pill">접속 중</span></div>` : ''}
+        <div class="ov"><span class="pill">${p.n} ${p.a}${I.check.replace('<svg', '<svg class="vv"')}</span><button class="pill likebtn" aria-label="좋아요">${I.heart}</button></div>
+      </article>`; }).join('')}
+    </div>
+  </div>${tabbar(0)}</div>`;
+const pinChat = () => `
+  <div class="frame" data-v="pin"><div class="scroll" style="inset-bottom:0">
+    <div class="status"></div>
+    <header class="chdr"><button class="iconbtn" aria-label="뒤로">${I.back}</button><span class="av">${img('ms-a', 96, 96, '')}</span>
+      <div style="flex:1"><b style="font-size:16px;font-weight:600">하늘</b><div style="font-size:13px;color:var(--mute)">성북구 · 접속 중</div></div>
+      <button class="iconbtn" aria-label="메뉴">${I.more}</button></header>
+    ${CHAT()}
+  </div>
+  <div class="inbar"><div class="in">메시지 보내기…</div><button class="send" aria-label="보내기">${I.up}</button></div>${tabbar(0)}</div>`;
+const pinPoints = () => `
+  <div class="frame" data-v="pin"><div class="scroll">
+    <div class="status"></div>
+    <div class="page">
+      <h1 class="h1">포인트</h1>
+      <section class="feature"><div class="sub">내 포인트</div><div class="big num">100P</div><div class="sub">무료 첫 대화 9회 · 오늘 무료 좋아요 2회 남음</div></section>
+      <section><h3 class="h3">포인트 모으기</h3>
+        <div class="lrow"><span class="iconbtn" aria-hidden="true">${I.cal}</span><div class="t"><b>출석 체크</b><small>하루 한 번 +10P</small></div><button class="btn p">받기</button></div>
+        <div class="lrow"><span class="iconbtn" aria-hidden="true">${I.pin}</span><div class="t"><b>위치 인증</b><small>하루 한 번 +5P</small></div><button class="btn s">인증</button></div>
+        <div class="lrow"><span class="iconbtn" aria-hidden="true">${I.phone}</span><div class="t"><b>휴대폰 인증</b><small>한 번 +100P</small></div><span class="btn dis">완료</span></div>
+      </section>
+      <section><h3 class="h3">상점</h3>
+        <div class="lrow"><span class="iconbtn" aria-hidden="true">${I.bolt}</span><div class="t"><b>부스트</b><small>30분 동안 추천 맨 위에 보여요</small></div><span class="price num">100P</span></div>
+        <div class="lrow"><span class="iconbtn" aria-hidden="true">${I.star}</span><div class="t"><b>슈퍼라이크</b><small>눈에 띄는 좋아요를 한 번 보내요</small></div><span class="price num">30P</span></div>
+      </section>
+      <section><h3 class="h3">설정</h3>
+        <div class="lrow"><span class="iconbtn" aria-hidden="true">${I.globe}</span><div class="t"><b>언어</b><small>한국어</small></div>${I.chev}</div>
+        <div class="lrow"><span class="iconbtn" aria-hidden="true">${I.moon}</span><div class="t"><b>화면 모드</b><small>시스템</small></div>${I.chev}</div>
+      </section>
+    </div>
+  </div>${tabbar(2)}</div>`;
+
+/* ── 2. Airbnb ────────────────────────────────────────────────── */
+const airHome = () => `
+  <div class="frame" data-v="air"><div class="scroll">
+    <div class="status"></div>
+    <header class="hdr">
+      <div class="search">${I.search}<div class="t"><b>어디서 만날까요?</b><small>성북구 · 20대 · 접속 중</small></div><button class="orb" aria-label="필터">${I.filter}</button></div>
+    </header>
+    <div class="ptabs"><span class="ptab on">추천</span><span class="ptab">새로 왔어요</span><span class="ptab">가까운 동네</span></div>
+    <div class="grid">
+      ${PEOPLE.map(p => `
+      <article class="card"><div class="ph">${img(p.s, 400, 500, p.n + ' 프로필 사진')}
+        ${p.on ? '<span class="badge">접속 중</span>' : ''}<button class="heart" aria-label="좋아요">${I.heart}</button></div>
+        <div class="cap"><b>${p.n}<span>${I.check.replace('<svg', '<svg class="ic" style="width:14px;height:14px;stroke-width:2.4"')}인증</span></b>
+          <small>${p.r} · ${p.j}</small><small>${p.m}</small><em>대화하기</em></div>
+      </article>`).join('')}
+    </div>
+  </div>${tabbar(0)}</div>`;
+const airChat = () => `
+  <div class="frame" data-v="air"><div class="scroll">
+    <div class="status"></div>
+    <header class="chdr"><button class="iconbtn" aria-label="뒤로">${I.back}</button><span class="av">${img('ms-a', 96, 96, '')}</span>
+      <div style="flex:1"><b style="font-size:16px;font-weight:600">하늘</b><div style="font-size:14px;color:var(--mute)">성북구</div></div>
+      <button class="iconbtn" aria-label="메뉴">${I.more}</button></header>
+    ${CHAT()}
+  </div>
+  <div class="inbar"><div class="in">메시지 보내기…</div><button class="send">보내기</button></div>${tabbar(0)}</div>`;
+const airPoints = () => `
+  <div class="frame" data-v="air"><div class="scroll">
+    <div class="status"></div>
+    <div class="page">
+      <h1 class="h1">포인트</h1>
+      <section class="feature"><div class="sub">내 포인트</div><div class="big num">100P</div><div class="sub">무료 첫 대화 9회 · 오늘 무료 좋아요 2회 남음</div></section>
+      <section><h3 class="h3">포인트 모으기</h3>
+        <div class="lrow"><span class="orb" aria-hidden="true">${I.cal}</span><div class="t"><b>출석 체크</b><small>하루 한 번 +10P</small></div><button class="btn p">받기</button></div>
+        <div class="lrow"><span class="orb" aria-hidden="true">${I.pin}</span><div class="t"><b>위치 인증</b><small>하루 한 번 +5P</small></div><button class="btn s">인증</button></div>
+        <div class="lrow"><span class="orb" aria-hidden="true">${I.phone}</span><div class="t"><b>휴대폰 인증</b><small>한 번 +100P</small></div><span class="btn dis">완료</span></div>
+      </section>
+      <section><h3 class="h3">상점</h3>
+        <div class="lrow"><span class="orb" aria-hidden="true">${I.bolt}</span><div class="t"><b>부스트</b><small>30분 동안 추천 맨 위에 보여요</small></div><span class="price num">100P</span></div>
+        <div class="lrow"><span class="orb" aria-hidden="true">${I.star}</span><div class="t"><b>슈퍼라이크</b><small>눈에 띄는 좋아요를 한 번 보내요</small></div><span class="price num">30P</span></div>
+      </section>
+      <section><h3 class="h3">설정</h3>
+        <div class="lrow"><span class="orb" aria-hidden="true">${I.globe}</span><div class="t"><b>언어</b><small>한국어</small></div>${I.chev}</div>
+        <div class="lrow"><span class="orb" aria-hidden="true">${I.moon}</span><div class="t"><b>화면 모드</b><small>시스템</small></div>${I.chev}</div>
+      </section>
+      <button class="big-cta">포인트 충전</button>
+    </div>
+  </div>${tabbar(2)}</div>`;
+
+/* ── 3. Apple ─────────────────────────────────────────────────── */
+const aplHome = () => `
+  <div class="frame" data-v="apl"><div class="scroll">
+    <div class="status"></div>
+    <header class="hdr"><div class="row-between"><h1 class="large">추천</h1><button class="iconbtn" aria-label="필터" style="width:44px;height:44px;border-radius:50%;background:var(--s3);color:var(--ink)">${I.filter}</button></div></header>
+    <div class="chips"><span class="chip on">전체</span><span class="chip">가까운 동네</span><span class="chip">접속 중</span><span class="chip">ENFP</span></div>
+    <div class="grid">
+      ${PEOPLE.map(p => `
+      <article class="card"><div class="ph">${img(p.s, 400, 400, p.n + ' 프로필 사진')}<button class="heart" aria-label="좋아요">${I.heart}</button></div>
+        <div class="cap"><b>${p.n} ${p.a}</b><small>${p.r} · ${p.j}</small><small>${p.m}${p.on ? ' · 접속 중' : ''}</small><a href="#">대화하기 ›</a></div>
+      </article>`).join('')}
+    </div>
+  </div>${tabbar(0)}</div>`;
+const aplChat = () => `
+  <div class="frame" data-v="apl"><div class="scroll">
+    <div class="status"></div>
+    <header class="chdr"><button class="iconbtn" aria-label="뒤로">${I.back}</button><span class="av">${img('ms-a', 96, 96, '')}</span>
+      <div style="flex:1"><b style="font-size:17px;font-weight:600">하늘</b><div style="font-size:13px;color:var(--mute)">성북구</div></div>
+      <button class="iconbtn" aria-label="메뉴">${I.more}</button></header>
+    ${CHAT()}
+  </div>
+  <div class="inbar"><div class="in">메시지</div><button class="send" aria-label="보내기">${I.up}</button></div>${tabbar(0)}</div>`;
+const aplPoints = () => `
+  <div class="frame" data-v="apl"><div class="scroll">
+    <div class="status"></div>
+    <header class="hdr"><h1 class="large">포인트</h1></header>
+    <div class="page">
+      <section class="feature"><div class="sub">내 포인트</div><div class="big num">100P</div><div class="sub">무료 첫 대화 9회 · 오늘 무료 좋아요 2회 남음</div></section>
+      <section><h3 class="h3">포인트 모으기</h3><div class="group">
+        <div class="lrow"><span style="color:var(--primary)" aria-hidden="true">${I.cal}</span><div class="t"><b>출석 체크</b><small>하루 한 번 +10P</small></div><button class="btn p">받기</button></div>
+        <div class="lrow"><span style="color:var(--primary)" aria-hidden="true">${I.pin}</span><div class="t"><b>위치 인증</b><small>하루 한 번 +5P</small></div><button class="btn s">인증</button></div>
+        <div class="lrow"><span style="color:var(--primary)" aria-hidden="true">${I.phone}</span><div class="t"><b>휴대폰 인증</b><small>한 번 +100P</small></div><span class="val">완료</span></div>
+      </div></section>
+      <section><h3 class="h3">상점</h3><div class="group">
+        <div class="lrow"><span style="color:var(--primary)" aria-hidden="true">${I.bolt}</span><div class="t"><b>부스트</b><small>30분 동안 추천 맨 위에 보여요</small></div><span class="val num">100P ${I.chev}</span></div>
+        <div class="lrow"><span style="color:var(--primary)" aria-hidden="true">${I.star}</span><div class="t"><b>슈퍼라이크</b><small>눈에 띄는 좋아요를 한 번 보내요</small></div><span class="val num">30P ${I.chev}</span></div>
+      </div></section>
+      <section><h3 class="h3">설정</h3><div class="group">
+        <div class="lrow"><span style="color:var(--primary)" aria-hidden="true">${I.globe}</span><div class="t"><b>언어</b></div><span class="val">한국어 ${I.chev}</span></div>
+        <div class="lrow"><span style="color:var(--primary)" aria-hidden="true">${I.moon}</span><div class="t"><b>화면 모드</b></div><span class="val">시스템 ${I.chev}</span></div>
+      </div></section>
+    </div>
+  </div>${tabbar(2)}</div>`;
+
+/* ── 4. Notion 에디토리얼 ─────────────────────────────────────── */
+const ntnHome = () => `
+  <div class="frame" data-v="ntn"><div class="scroll">
+    <div class="status"></div>
+    <header class="hdr"><div class="top"><span class="logo">meesae</span><button class="iconbtn" aria-label="필터">${I.filter}</button></div>
+      <div class="ptabs"><span class="ptab on">추천</span><span class="ptab">가까운 동네</span><span class="ptab">접속 중</span></div></header>
+    <section class="question"><small>오늘의 질문</small><h2>주말 아침, 느긋한 브런치와 이른 러닝 중 어느 쪽이 더 나다운가요?</h2>
+      <div class="ans"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><span style="margin-left:4px">3명이 답했어요</span></div></section>
+    <div class="grid">
+      ${PEOPLE.map(p => `
+      <article class="card"><div class="ph">${img(p.s, 400, 400, p.n + ' 프로필 사진')}</div>
+        <div class="cap"><b>${p.n} <span>${p.a}</span>${I.check.replace('<svg', '<svg style="width:14px;height:14px;stroke-width:2.4;color:#1f6c9f"')}</b>
+          <div class="tags"><span class="tag lav">${p.r}</span><span class="tag mint">${p.m}</span><span class="tag gray">${p.j}</span>${p.on ? '<span class="tag peach">접속 중</span>' : ''}</div>
+          <div class="act"><button class="btn p">대화</button><button class="btn s" aria-label="좋아요">${I.heart.replace('<svg', '<svg class="ic"')}</button></div></div>
+      </article>`).join('')}
+    </div>
+  </div>${tabbar(0)}</div>`;
+const ntnChat = () => `
+  <div class="frame" data-v="ntn"><div class="scroll">
+    <div class="status"></div>
+    <header class="chdr"><button class="iconbtn" aria-label="뒤로">${I.back}</button><span class="av">${img('ms-a', 96, 96, '')}</span>
+      <div style="flex:1"><b style="font-size:15px;font-weight:600">하늘</b><div style="font-size:13px;color:var(--mute)">성북구 · 디자이너</div></div>
+      <button class="iconbtn" aria-label="메뉴">${I.more}</button></header>
+    ${CHAT()}
+  </div>
+  <div class="inbar"><div class="in">메시지 보내기…</div><button class="send" aria-label="보내기">${I.up}</button></div>${tabbar(0)}</div>`;
+const ntnPoints = () => `
+  <div class="frame" data-v="ntn"><div class="scroll">
+    <div class="status"></div>
+    <div class="page">
+      <h1 class="h1">포인트</h1>
+      <section class="feature"><div class="sub">내 포인트</div><div class="big num">100P</div><div class="sub">무료 첫 대화 9회 · 오늘 무료 좋아요 2회 남음</div></section>
+      <section><h3 class="h3">포인트 모으기</h3><div class="group">
+        <div class="lrow"><span aria-hidden="true" style="color:var(--mute)">${I.cal}</span><div class="t"><b>출석 체크</b><small>하루 한 번 +10P</small></div><button class="btn p">받기</button></div>
+        <div class="lrow"><span aria-hidden="true" style="color:var(--mute)">${I.pin}</span><div class="t"><b>위치 인증</b><small>하루 한 번 +5P</small></div><button class="btn s">인증</button></div>
+        <div class="lrow"><span aria-hidden="true" style="color:var(--mute)">${I.phone}</span><div class="t"><b>휴대폰 인증</b><small>한 번 +100P</small></div><span class="tag mint">완료</span></div>
+      </div></section>
+      <section><h3 class="h3">상점</h3><div class="group">
+        <div class="lrow"><span aria-hidden="true" style="color:var(--mute)">${I.bolt}</span><div class="t"><b>부스트</b><small>30분 동안 추천 맨 위에 보여요</small></div><span class="price num">100P</span></div>
+        <div class="lrow"><span aria-hidden="true" style="color:var(--mute)">${I.star}</span><div class="t"><b>슈퍼라이크</b><small>눈에 띄는 좋아요를 한 번 보내요</small></div><span class="price num">30P</span></div>
+      </div></section>
+      <section><h3 class="h3">설정</h3><div class="group">
+        <div class="lrow"><span aria-hidden="true" style="color:var(--mute)">${I.globe}</span><div class="t"><b>언어</b></div><span class="val">한국어 ${I.chev}</span></div>
+        <div class="lrow"><span aria-hidden="true" style="color:var(--mute)">${I.moon}</span><div class="t"><b>화면 모드</b></div><span class="val">시스템 ${I.chev}</span></div>
+      </div></section>
+    </div>
+  </div>${tabbar(2)}</div>`;
+
+const V = {
+  pin: { title: '1 · Pinterest 형 "비주얼 디스커버리"', desc: '<b>design-md/pinterest.</b> 크림 중립 배경, 빨강은 CTA·활성 탭에만. 메이슬리 2열(8px), 사진이 곧 카드(패딩 없음, radius 16 통일, 그림자·테두리 없음), 정보는 흰 알약으로 사진 위에. 밀도 높고 탐색 지향.', frames: [pinHome, pinChat, pinPoints] },
+  air: { title: '2 · Airbnb 형 "따뜻한 신뢰"', desc: '<b>design-md/airbnb.</b> 흰 캔버스 + 잉크 #222, Rausch 는 CTA·하트에만. 4:5 사진 카드(radius 14) 아래 캡션, 굵기 500~600 위주, 그림자는 검색 알약 한 곳만. 밑줄 탭, 버튼 radius 8.', frames: [airHome, airChat, airPoints] },
+  apl: { title: '3 · Apple HIG 형 "시스템 그룹"', desc: '<b>design-md/apple.</b> 양피지 #f5f5f7 위 흰 그룹 카드(radius 18), 상호작용은 파랑 1색, 본문 17px 자간 -0.374, pill CTA, 블러 탭바, iOS 설정형 리스트. 윌유처럼 차분한 신뢰 톤.', frames: [aplHome, aplChat, aplPoints] },
+  ntn: { title: '4 · Notion 에디토리얼 형 "워크스페이스"', desc: '<b>design-md/notion + minimalist-ui.</b> 흰 캔버스, 1px #e5e3df, 카드 12 / 버튼 8, 검정 CTA(보라 대신), 파스텔 태그로 속성 표시, 튤립식 "오늘의 질문" 카드(세리프는 여기만). 문서처럼 차분.', frames: [ntnHome, ntnChat, ntnPoints] },
+};
+const q = new URLSearchParams(location.search);
+const want = q.get('variant') || 'all';
+const screen = q.get('screen');                       // home | chat | points
+const keys = want === 'all' ? Object.keys(V) : want.split(',').filter(k => V[k]);
+const idx = { home: 0, chat: 1, points: 2 }[screen];
+document.getElementById('cols').innerHTML = keys.map(k => `
+  <div class="col"><h2>${V[k].title}</h2><p class="desc">${V[k].desc}</p>
+    ${(idx === undefined ? V[k].frames : [V[k].frames[idx]]).map(f => f()).join('')}
+  </div>`).join('');
+document.querySelectorAll('.bar a').forEach(a => a.classList.toggle('on', a.dataset.v === want));
+// ?focus=1 : 캡처용. 이미지가 다 뜬 뒤 첫 프레임 위로 스크롤
+if (q.get('focus')) window.addEventListener('load', () => { const f = document.querySelector('.frame'); window.scrollTo(0, f.getBoundingClientRect().top + window.scrollY - 8); });
+</script>
+</body>
+</html>

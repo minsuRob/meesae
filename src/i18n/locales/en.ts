@@ -24,6 +24,7 @@ export const en: Catalog = {
     skip: 'Skip',
     start: "Let's go",
     done: 'Done',
+    close: 'Close',
     points: (p) => `${p.n.toLocaleString('en-US')} pts`,
   },
 
@@ -189,6 +190,7 @@ export const en: Catalog = {
     map: 'Map',
     feed: 'Feed',
     myProfile: 'My profile',
+    unreadA11y: (p: { n: number }) => `${p.n} unread`,
   },
 
   header: {
@@ -214,6 +216,10 @@ export const en: Catalog = {
     lowPointsAction: 'Get points',
     pickPane: 'Pick a chat or profile',
     pickPaneBody: "Choose one from the list and it'll open here",
+    searchTitle: 'Who will you meet?',
+    anyone: 'Everyone',
+    ageRange: (p: { min: number; max: number }) => `${p.min}-${p.max}`,
+    verified: 'Verified',
   },
 
   filters: {
@@ -233,6 +239,8 @@ export const en: Catalog = {
   },
 
   chat: {
+    today: 'Today',
+    yesterday: 'Yesterday',
     title: 'Chats',
     empty: 'No chats yet',
     emptyBody: "Find someone you like in Discover and say hi first",
@@ -314,6 +322,7 @@ export const en: Catalog = {
     tabFeed: 'Feed',
     tabPoints: 'Points',
     write: 'New post',
+    post: 'Post',
     empty: 'Be the first to post',
     emptyBody: 'People in your country will see it',
     loadFailed: "Couldn't load the feed",
@@ -388,6 +397,7 @@ export const en: Catalog = {
   },
 
   me: {
+    title: 'My profile',
     settings: 'Settings',
     phoneBadge: 'Phone verified',
     verifyCta: 'Verify your phone to unlock photos and live location',
@@ -397,6 +407,9 @@ export const en: Catalog = {
 
   settings: {
     title: 'Settings',
+    sectionPreferences: 'Preferences',
+    sectionRegion: 'Location',
+    sectionAccount: 'Account',
     country: 'Country',
     countryHint: 'Discover and the feed are based on the country you pick',
     region: 'Your area',

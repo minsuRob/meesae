@@ -14,7 +14,7 @@ export function SplitPane({ list, detail, placeholder }: { list: ReactNode; deta
   if (mode === 'mobile') return <View style={{ flex: 1 }}>{list}</View>;
   return (
     <View style={{ flex: 1, flexDirection: 'row', backgroundColor: colors.bg }}>
-      <View style={{ width: layout.listPaneWidth, borderRightWidth: 1, borderRightColor: colors.border }}>{list}</View>
+      <View style={{ width: layout.listPaneWidth, borderRightWidth: 1, borderRightColor: colors.hairline }}>{list}</View>
       <View style={{ flex: 1 }}>{detail ?? placeholder}</View>
     </View>
   );

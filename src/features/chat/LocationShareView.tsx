@@ -69,7 +69,7 @@ export function LocationShareView({ id }: { id: string }) {
 
   if (share.loading) return <Loading />;
   if (!share.data || !active) {
-    return <Empty title={t('share.ended')} action={<Button title={t('common.back')} small onPress={() => router.back()} />} />;
+    return <Empty icon="navigate-outline" title={t('share.ended')} action={<Button title={t('common.back')} small kind="secondary" onPress={() => router.back()} />} />;
   }
 
   const first = markers[0] ?? { lat: 37.5665, lng: 126.978 };
@@ -88,12 +88,12 @@ export function LocationShareView({ id }: { id: string }) {
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
       <MapView center={first} zoom={14} markers={markers} />
       <View style={{ position: 'absolute', left: space.lg, right: space.lg, bottom: space.xl }}>
-        <Card>
+        <Card elevation={2} outlined={false}>
           <Row style={{ justifyContent: 'space-between' }}>
             <Text variant="label" style={{ flex: 1 }}>
               {t('share.status', { name: peerName ?? t('share.partner'), minutes: left })}
             </Text>
-            <Button title={t('share.stop')} small kind="danger" onPress={stop} />
+            <Button title={t('share.stop')} small pill kind="danger" onPress={stop} />
           </Row>
         </Card>
       </View>

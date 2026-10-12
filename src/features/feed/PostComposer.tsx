@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Pressable, View } from 'react-native';
 
 import { LIMITS } from '@shared/validators';
 
@@ -7,17 +6,13 @@ import { call, newRequestId, toApiError } from '@/firebase/api';
 import { pickImage, uploadImage, useStorageUrl } from '@/firebase/storage';
 import { useT } from '@/i18n';
 import { useUid } from '@/store/session';
-import { Button, ErrorText, Input, Photo, Row, Sheet, Stack, Text } from '@/ui/primitives';
-import { radius, space, useColors } from '@/ui/theme';
+import { Button, ErrorText, Icon, Input, PhotoTile, Press, Row, Sheet, Stack, Text } from '@/ui/primitives';
+import { layout, radius, space, useColors } from '@/ui/theme';
 
 function Thumb({ path, onRemove }: { path: string; onRemove: () => void }) {
   const { t } = useT();
   const url = useStorageUrl(path);
-  return (
-    <Pressable onPress={onRemove} style={{ width: 72 }} accessibilityLabel={t('onboarding.removePhoto')}>
-      <Photo source={url ? { uri: url } : undefined} aspect={1} />
-    </Pressable>
-  );
+  return <PhotoTile uri={url} onRemove={onRemove} removeLabel={t('onboarding.removePhoto')} />;
 }
 
 export function PostComposer({ visible, onClose, onPosted }: { visible: boolean; onClose: () => void; onPosted: (id: string) => void }) {
@@ -63,43 +58,50 @@ export function PostComposer({ visible, onClose, onPosted }: { visible: boolean;
   }
 
   return (
-    <Sheet visible={visible} onClose={onClose} title={t('feed.composerTitle')}>
-      <Stack gap={space.md}>
+    <Sheet
+      visible={visible}
+      onClose={onClose}
+      title={t('feed.composerTitle')}
+      closeLabel={t('common.close')}
+      footer={<Button title={t('feed.publish')} onPress={submit} loading={busy} disabled={!text.trim()} />}
+    >
+      <Stack gap={space.lg} style={{ paddingVertical: space.sm }}>
         <Input
           value={text}
           onChangeText={setText}
           placeholder={t('feed.composerPlaceholder')}
           multiline
           maxLength={LIMITS.POST_MAX}
-          style={{ minHeight: 120, textAlignVertical: 'top' }}
+          style={{ minHeight: 140, textAlignVertical: 'top' }}
         />
         <Row gap={space.sm} style={{ flexWrap: 'wrap' }}>
           {images.map((p) => (
             <Thumb key={p} path={p} onRemove={() => setImages((xs) => xs.filter((x) => x !== p))} />
           ))}
           {images.length < LIMITS.POST_IMAGES_MAX ? (
-            <Pressable
+            <Press
               onPress={addImage}
+              accessibilityRole="button"
               accessibilityLabel={t('onboarding.addPhoto')}
+              containerStyle={{ width: layout.photoTileWidth }}
               style={{
-                width: 72,
-                height: 72,
-                borderRadius: radius.md,
+                aspectRatio: 1,
+                borderRadius: radius.sm,
                 borderWidth: 1,
-                borderColor: colors.border,
+                borderStyle: 'dashed',
+                borderColor: colors.borderStrong,
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
             >
-              <Text color={colors.textMuted}>＋</Text>
-            </Pressable>
+              <Icon name="add" size="xl" color={colors.textMuted} />
+            </Press>
           ) : null}
         </Row>
         <ErrorText>{error}</ErrorText>
-        <View>
-          <Button title={t('feed.publish')} onPress={submit} loading={busy} disabled={!text.trim()} />
-        </View>
-        <Text variant="caption">{t('feed.noContacts')}</Text>
+        <Text variant="caption" tone="faint">
+          {t('feed.noContacts')}
+        </Text>
       </Stack>
     </Sheet>
   );

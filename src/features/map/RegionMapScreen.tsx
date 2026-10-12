@@ -62,7 +62,7 @@ export function RegionMapScreen() {
     try {
       const res = await verifyLocation();
       notify(
-        `📍 ${regionName(res.regionLabels, res.regionLabel, locale)}`,
+        regionName(res.regionLabels, res.regionLabel, locale) ?? '',
         res.rewarded > 0 ? t('map.rewarded', { n: res.rewarded }) : t('map.alreadyRewarded'),
       );
       stats.reload();
@@ -75,12 +75,13 @@ export function RegionMapScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
-      <MainHeader title={t('map.title')} right={<Button title={t('map.verify')} small kind="secondary" onPress={verify} loading={busy} />} />
+      <MainHeader title={t('map.title')} right={<Button title={t('map.verify')} small pill kind="secondary" onPress={verify} loading={busy} />} />
       {stats.error ? (
         <Empty
+          icon="map-outline"
           title={t('map.loadFailed')}
           body={toApiError(stats.error).message}
-          action={<Button title={t('common.retry')} small onPress={stats.reload} />}
+          action={<Button title={t('common.retry')} small kind="secondary" onPress={stats.reload} />}
         />
       ) : !regions ? (
         <Loading />
@@ -88,7 +89,7 @@ export function RegionMapScreen() {
         <View style={{ flex: 1 }}>
           <MapView center={view} zoom={view.zoom} markers={markers} onMarkerPress={setSelected} />
           <View style={{ position: 'absolute', left: space.lg, right: space.lg, bottom: space.lg }}>
-            <Card>
+            <Card elevation={2} outlined={false}>
               {sel ? (
                 <Row style={{ justifyContent: 'space-between' }}>
                   <Stack gap={2} style={{ flex: 1 }}>
@@ -96,11 +97,11 @@ export function RegionMapScreen() {
                     <Text variant="caption">{t('map.regionCount', { n: sel.count })}</Text>
                   </Stack>
                   {sel.regionKey === mine ? (
-                    <Button title={t('map.seeLocals')} small onPress={() => router.push({ pathname: '/chat', params: { scope: 'district' } })} />
+                    <Button title={t('map.seeLocals')} small pill onPress={() => router.push({ pathname: '/chat', params: { scope: 'district' } })} />
                   ) : null}
                 </Row>
               ) : (
-                <Text variant="caption">
+                <Text variant="bodySm" tone="muted">
                   {myRegion ? t('map.myRegion', { name: nameOf(myRegion) }) : t('map.noRegion')} · {t('map.tapHint')}
                 </Text>
               )}

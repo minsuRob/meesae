@@ -4,7 +4,7 @@
 
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Pressable } from 'react-native';
+import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import type { UserPublic } from '@shared/models';
@@ -23,18 +23,15 @@ import { pickImage, uploadImage, useStorageUrl } from '@/firebase/storage';
 import { useMyProfile } from '@/features/profile/useMyProfile';
 import { regionName, useT } from '@/i18n';
 import { useClaims, useUid } from '@/store/session';
+import { KeyboardScrollView } from '@/ui/keyboard';
 import { notify } from '@/ui/notify';
-import { Badge, Button, Chip, Input, Loading, Photo, Row, Screen, Stack, Text } from '@/ui/primitives';
-import { space, useColors } from '@/ui/theme';
+import { Button, Chip, HeaderBar, IconButton, Input, Loading, PhotoTile, Pill, Row, Stack, Text, toast } from '@/ui/primitives';
+import { layout, space, useColors } from '@/ui/theme';
 
-function Thumb({ path, onRemove }: { path: string; onRemove: () => void }) {
+function Thumb({ path, onRemove }: { path: string; onRemove?: () => void }) {
   const { t } = useT();
   const url = useStorageUrl(path);
-  return (
-    <Pressable onPress={onRemove} style={{ width: '31%' }} accessibilityLabel={t('onboarding.removePhoto')}>
-      <Photo source={url ? { uri: url } : undefined} />
-    </Pressable>
-  );
+  return <PhotoTile uri={url} onRemove={onRemove} removeLabel={t('onboarding.removePhoto')} aspect={layout.photoAspect} />;
 }
 
 export default function MeScreen() {
@@ -43,6 +40,15 @@ export default function MeScreen() {
   if (!me || !uid) return <Loading />;
   // 폼은 처음 받은 프로필로 한 번 초기화한다 (저장 후 실시간 갱신이 입력 중인 값을 덮지 않게)
   return <MeForm key={me.uid} me={me} uid={uid} />;
+}
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <Stack gap={space.sm}>
+      <Text variant="subtitle">{title}</Text>
+      {children}
+    </Stack>
+  );
 }
 
 function MeForm({ me, uid }: { me: UserPublic; uid: string }) {
@@ -77,7 +83,7 @@ function MeForm({ me, uid }: { me: UserPublic; uid: string }) {
     setBusy(true);
     try {
       await call('updateProfile', { nickname, job, school, mbti, drinking, smoking, photos });
-      notify(t('common.saved'));
+      toast(t('common.saved'));
     } catch (e) {
       notify(toApiError(e).message);
     } finally {
@@ -87,56 +93,76 @@ function MeForm({ me, uid }: { me: UserPublic; uid: string }) {
 
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.bg }}>
-      <Screen scroll narrow edges={[]}>
-        <Stack gap={space.lg}>
-          <Row style={{ justifyContent: 'space-between' }}>
-            <Button title={`← ${t('common.back')}`} kind="ghost" small onPress={() => (router.canGoBack() ? router.back() : router.replace('/chat'))} />
-            <Button title={t('me.settings')} kind="secondary" small onPress={() => router.push('/profile/settings')} />
-          </Row>
-          <Row gap={space.sm}>
-            <Text variant="title">{me.nickname}</Text>
-            <Text variant="heading" color={colors.textMuted}>
+      <HeaderBar
+        title={t('me.title')}
+        center
+        onBack={() => (router.canGoBack() ? router.back() : router.replace('/chat'))}
+        backLabel={t('common.back')}
+        right={<IconButton name="settings-outline" label={t('me.settings')} variant="ghost" onPress={() => router.push('/profile/settings')} />}
+      />
+      <KeyboardScrollView
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ padding: space.lg, gap: space.xl, maxWidth: layout.contentMaxWidth, width: '100%', alignSelf: 'center' }}
+      >
+        <Stack gap={space.sm}>
+          <Row gap={space.sm} style={{ alignItems: 'baseline' }}>
+            <Text variant="display">{me.nickname}</Text>
+            <Text variant="heading" tone="muted">
               {me.age}
             </Text>
-            {claims.phoneVerified ? <Badge label={t('me.phoneBadge')} /> : null}
-            {region ? <Badge label={`📍 ${region}`} color={colors.accent} /> : null}
+          </Row>
+          <Row gap={space.xs} style={{ flexWrap: 'wrap' }}>
+            {claims.phoneVerified ? <Pill label={t('me.phoneBadge')} tone="success" icon="checkmark-circle" /> : null}
+            {region ? <Pill label={region} tone="outline" icon="location-outline" /> : null}
           </Row>
           {!claims.phoneVerified ? (
-            <Button title={t('me.verifyCta')} kind="secondary" onPress={() => router.push('/profile/phone-verify')} />
+            <Button title={t('me.verifyCta')} kind="secondary" small onPress={() => router.push('/profile/phone-verify')} style={{ alignSelf: 'flex-start' }} />
           ) : null}
+        </Stack>
 
-          <Text variant="label">{t('me.photosHint')}</Text>
+        <Section title={t('me.photosHint')}>
           <Row style={{ flexWrap: 'wrap' }} gap={space.sm}>
             {photos.map((p) => (
-              <Thumb key={p} path={p} onRemove={() => photos.length > 1 && setPhotos(photos.filter((x) => x !== p))} />
+              <Thumb key={p} path={p} onRemove={photos.length > 1 ? () => setPhotos(photos.filter((x) => x !== p)) : undefined} />
             ))}
           </Row>
-          {photos.length < LIMITS.PROFILE_PHOTOS_MAX ? <Button title={t('me.addPhoto')} kind="secondary" small onPress={addPhoto} /> : null}
+          {photos.length < LIMITS.PROFILE_PHOTOS_MAX ? (
+            <Button title={t('me.addPhoto')} kind="secondary" small onPress={addPhoto} loading={busy} style={{ alignSelf: 'flex-start' }} />
+          ) : null}
+        </Section>
 
-          <Input label={t('fields.nickname')} value={nickname} onChangeText={setNickname} maxLength={LIMITS.NICKNAME_MAX} />
-          <Input label={t('fields.job')} value={job} onChangeText={setJob} maxLength={LIMITS.JOB_MAX} />
-          <Input label={t('fields.school')} value={school} onChangeText={setSchool} maxLength={LIMITS.SCHOOL_MAX} />
-          <Text variant="label">MBTI</Text>
+        <Input label={t('fields.nickname')} value={nickname} onChangeText={setNickname} maxLength={LIMITS.NICKNAME_MAX} />
+        <Input label={t('fields.job')} value={job} onChangeText={setJob} maxLength={LIMITS.JOB_MAX} />
+        <Input label={t('fields.school')} value={school} onChangeText={setSchool} maxLength={LIMITS.SCHOOL_MAX} />
+
+        <Section title={t('fields.mbti')}>
           <Row style={{ flexWrap: 'wrap' }}>
             {MBTIS.map((m) => (
-              <Chip key={m} label={m} selected={mbti === m} onPress={() => setMbti(mbti === m ? null : m)} />
+              <Chip key={m} label={m} small selected={mbti === m} onPress={() => setMbti(mbti === m ? null : m)} />
             ))}
           </Row>
-          <Text variant="label">{t('fields.drinking')}</Text>
+        </Section>
+        <Section title={t('fields.drinking')}>
           <Row style={{ flexWrap: 'wrap' }}>
             {DRINKING.map((d) => (
               <Chip key={d} label={t(`options.drinking.${d}`)} selected={drinking === d} onPress={() => setDrinking(d)} />
             ))}
           </Row>
-          <Text variant="label">{t('fields.smoking')}</Text>
+        </Section>
+        <Section title={t('fields.smoking')}>
           <Row style={{ flexWrap: 'wrap' }}>
             {SMOKING.map((d) => (
               <Chip key={d} label={t(`options.smoking.${d}`)} selected={smoking === d} onPress={() => setSmoking(d)} />
             ))}
           </Row>
+        </Section>
+        <View style={{ height: space.xl }} />
+      </KeyboardScrollView>
+      <View style={{ borderTopWidth: 1, borderTopColor: colors.hairline, backgroundColor: colors.surface, padding: space.lg }}>
+        <View style={{ maxWidth: layout.contentMaxWidth, width: '100%', alignSelf: 'center' }}>
           <Button title={t('common.save')} onPress={save} loading={busy} />
-        </Stack>
-      </Screen>
+        </View>
+      </View>
     </SafeAreaView>
   );
 }

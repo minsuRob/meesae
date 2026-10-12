@@ -6,8 +6,10 @@
 
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { FlatList, Pressable, View } from 'react-native';
+import { FlatList, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+import type { DiscoverFilters } from '@shared/models';
 
 import { ConversationList } from '@/features/chat/ConversationList';
 import { ConversationView } from '@/features/chat/ConversationView';
@@ -16,15 +18,63 @@ import { ProfileCardView } from '@/features/discover/ProfileCardView';
 import { useRecommendations } from '@/features/discover/useRecommendations';
 import { MainHeader } from '@/features/profile/MainHeader';
 import { ProfileView } from '@/features/profile/ProfileView';
-import { useT } from '@/i18n';
+import { useT, type T } from '@/i18n';
 import { useFilters } from '@/store/filters';
 import { useUid } from '@/store/session';
 import { SplitPane } from '@/ui/layout/SplitPane';
 import { useLayoutMode } from '@/ui/layout/useLayoutMode';
-import { Button, Empty, Icon, Loading, Segmented, Stack } from '@/ui/primitives';
-import { space, useColors } from '@/ui/theme';
+import { Button, Empty, Icon, IconButton, Press, Row, SkeletonList, Stack, Tabs, Text } from '@/ui/primitives';
+import { control, radius, space, useColors, useElevation } from '@/ui/theme';
 
 type Tab = 'discover' | 'chats';
+
+/** 필터 요약 한 줄: 범위 · 성별 · 나이 */
+function filterSummary(f: DiscoverFilters, t: T): string {
+  const scope = f.scope === 'district' ? t('filters.scopeDistrict') : f.scope === 'admin1' ? t('filters.scopeAdmin1') : t('filters.scopeCountry');
+  const genders = f.genders?.length ? f.genders.map((g) => t(`options.gender.${g}`)).join('/') : null;
+  const age = f.ageMin || f.ageMax ? t('discover.ageRange', { min: f.ageMin ?? 18, max: f.ageMax ?? 99 }) : null;
+  return [scope, genders, age].filter(Boolean).join(' · ');
+}
+
+/** 검색창처럼 생긴 필터 요약 알약 (이 화면에서 유일하게 그림자가 있는 요소) */
+function FilterPill({ summary, onPress }: { summary: string; onPress: () => void }) {
+  const colors = useColors();
+  const elevation = useElevation();
+  const { t } = useT();
+  return (
+    <View style={{ paddingHorizontal: space.lg, paddingVertical: space.md }}>
+      <Press
+        onPress={onPress}
+        accessibilityRole="button"
+        accessibilityLabel={t('discover.filter')}
+        haptic={false}
+        pressScale={0.99}
+        style={{
+          height: control.input,
+          borderRadius: radius.pill,
+          backgroundColor: colors.surface,
+          boxShadow: elevation[1],
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: space.md,
+          paddingLeft: space.lg,
+          paddingRight: space.sm,
+        }}
+      >
+        <Icon name="search" size="md" />
+        <Stack gap={0} style={{ flex: 1 }}>
+          <Text variant="label" style={{ fontWeight: '600' }} numberOfLines={1}>
+            {t('discover.searchTitle')}
+          </Text>
+          <Text variant="caption" numberOfLines={1}>
+            {summary}
+          </Text>
+        </Stack>
+        <IconButton name="options-outline" label={t('discover.filter')} variant="tonal" size="md" onPress={onPress} />
+      </Press>
+    </View>
+  );
+}
 
 function DiscoverList({ columns, onOpen }: { columns: number; onOpen: (uid: string) => void }) {
   const { t } = useT();
@@ -32,13 +82,14 @@ function DiscoverList({ columns, onOpen }: { columns: number; onOpen: (uid: stri
   const hydrated = useFilters((s) => s.hydrated);
   const rec = useRecommendations(filters, hydrated);
 
-  if (!hydrated || (rec.loading && !rec.items.length)) return <Loading />;
+  if (!hydrated || (rec.loading && !rec.items.length)) return <SkeletonList kind="card" columns={columns} count={columns * 2} />;
   if (rec.error) {
     return (
       <Empty
+        icon="alert-circle-outline"
         title={rec.errorCode === 'PERK_REQUIRED' ? t('errors.PERK_REQUIRED') : t('discover.loadFailed')}
         body={rec.error}
-        action={<Button title={t('common.retry')} small onPress={rec.refresh} />}
+        action={<Button title={t('common.retry')} small kind="secondary" onPress={rec.refresh} />}
       />
     );
   }
@@ -48,8 +99,8 @@ function DiscoverList({ columns, onOpen }: { columns: number; onOpen: (uid: stri
       data={rec.items}
       numColumns={columns}
       keyExtractor={(p) => p.uid}
-      contentContainerStyle={{ padding: space.md, gap: space.md }}
-      columnWrapperStyle={columns > 1 ? { gap: space.md } : undefined}
+      contentContainerStyle={{ paddingHorizontal: space.lg, paddingTop: space.sm, paddingBottom: space.xxl, gap: space.xl }}
+      columnWrapperStyle={columns > 1 ? { gap: space.lg } : undefined}
       renderItem={({ item }) => (
         <View style={{ flex: 1 / columns }}>
           <ProfileCardView p={item} onLiked={rec.markLiked} onOpen={onOpen} />
@@ -59,7 +110,7 @@ function DiscoverList({ columns, onOpen }: { columns: number; onOpen: (uid: stri
       onEndReachedThreshold={0.5}
       refreshing={rec.loading}
       onRefresh={rec.refresh}
-      ListEmptyComponent={<Empty title={t('discover.empty')} body={t('discover.emptyBody')} />}
+      ListEmptyComponent={<Empty icon="people-outline" title={t('discover.empty')} body={t('discover.emptyBody')} />}
     />
   );
 }
@@ -91,18 +142,11 @@ export default function ChatTab() {
 
   const list = (
     <Stack gap={0} style={{ flex: 1 }}>
-      <View style={{ padding: space.md }}>
-        <Segmented<Tab>
-          value={tab}
-          onChange={setTab}
-          options={[
-            { value: 'discover', label: t('discover.tabDiscover') },
-            { value: 'chats', label: t('discover.tabChats') },
-          ]}
-        />
-      </View>
       {tab === 'discover' ? (
-        <DiscoverList columns={desktop ? 1 : 2} onOpen={openProfile} />
+        <>
+          <FilterPill summary={filterSummary(filters, t)} onPress={() => setFilterOpen(true)} />
+          <DiscoverList columns={desktop ? 1 : 2} onOpen={openProfile} />
+        </>
       ) : (
         <ConversationList selectedId={params.c} onOpen={openConversation} />
       )}
@@ -117,20 +161,22 @@ export default function ChatTab() {
 
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.bg }}>
-      <MainHeader
-        title={t('chat.title')}
-        right={
-          tab === 'discover' ? (
-            <Pressable onPress={() => setFilterOpen(true)} accessibilityLabel={t('discover.filter')}>
-              <Icon name="options-outline" />
-            </Pressable>
-          ) : null
-        }
-      />
+      <MainHeader wordmark>
+        <Row gap={0}>
+          <Tabs<Tab>
+            value={tab}
+            onChange={setTab}
+            options={[
+              { value: 'discover', label: t('discover.tabDiscover') },
+              { value: 'chats', label: t('discover.tabChats') },
+            ]}
+          />
+        </Row>
+      </MainHeader>
       <SplitPane
         list={list}
         detail={detail}
-        placeholder={<Empty title={t('discover.pickPane')} body={t('discover.pickPaneBody')} />}
+        placeholder={<Empty icon="chatbubbles-outline" title={t('discover.pickPane')} body={t('discover.pickPaneBody')} />}
       />
       <FilterSheet
         key={filterOpen ? 'open' : 'closed'}

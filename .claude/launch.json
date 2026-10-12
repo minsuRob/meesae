@@ -27,6 +27,18 @@
         "--clear"
       ],
       "port": 8098
+    },
+    {
+      "name": "web-ui",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "expo",
+        "start",
+        "--web",
+        "--port",
+        "8099"
+      ],
+      "port": 8099
     }
   ]
 }

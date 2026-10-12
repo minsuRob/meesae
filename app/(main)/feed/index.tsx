@@ -1,6 +1,6 @@
 /**
- * 메뉴 3: 게시물 피드 + 포인트 허브 (세그먼트).
- * desktop 은 피드 목록 | 글 상세 2패널.
+ * 메뉴 3: 게시물 피드 + 포인트 허브 (밑줄 탭).
+ * desktop 은 피드 목록 | 글 상세 2패널. 글쓰기는 모바일에선 떠 있는 버튼, 데스크톱에선 헤더 버튼.
  */
 
 import { router, useLocalSearchParams } from 'expo-router';
@@ -16,8 +16,8 @@ import { MainHeader } from '@/features/profile/MainHeader';
 import { useT } from '@/i18n';
 import { SplitPane } from '@/ui/layout/SplitPane';
 import { useLayoutMode } from '@/ui/layout/useLayoutMode';
-import { Empty, Segmented } from '@/ui/primitives';
-import { space, useColors } from '@/ui/theme';
+import { Button, Empty, Tabs } from '@/ui/primitives';
+import { useColors } from '@/ui/theme';
 
 type Tab = 'feed' | 'points';
 
@@ -34,37 +34,30 @@ export default function FeedTab() {
   const openPost = (id: string) =>
     desktop ? router.setParams({ post: id }) : router.push({ pathname: '/feed/[postId]', params: { postId: id } });
 
-  const segment = (
-    <View style={{ padding: space.md }}>
-      <Segmented<Tab>
-        value={tab}
-        onChange={(next) => router.setParams({ tab: next })}
-        options={[
-          { value: 'feed', label: t('feed.tabFeed') },
-          { value: 'points', label: t('feed.tabPoints') },
-        ]}
-      />
-    </View>
-  );
-
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.bg }}>
-      <MainHeader title={tab === 'feed' ? t('feed.title') : t('points.title')} />
+      <MainHeader
+        title={tab === 'feed' ? t('feed.title') : t('points.title')}
+        right={desktop && tab === 'feed' ? <Button title={t('feed.write')} small kind="secondary" onPress={() => setComposing(true)} /> : null}
+      >
+        <Tabs<Tab>
+          value={tab}
+          onChange={(next) => router.setParams({ tab: next })}
+          options={[
+            { value: 'feed', label: t('feed.tabFeed') },
+            { value: 'points', label: t('feed.tabPoints') },
+          ]}
+        />
+      </MainHeader>
       {tab === 'points' ? (
         <View style={{ flex: 1 }}>
-          {segment}
           <PointsHub />
         </View>
       ) : (
         <SplitPane
-          list={
-            <View style={{ flex: 1 }}>
-              {segment}
-              <PostList onOpen={openPost} onCompose={() => setComposing(true)} />
-            </View>
-          }
+          list={<PostList onOpen={openPost} onCompose={desktop ? undefined : () => setComposing(true)} />}
           detail={params.post ? <PostDetail key={params.post} id={params.post} embedded /> : undefined}
-          placeholder={<Empty title={t('feed.pickPost')} />}
+          placeholder={<Empty icon="newspaper-outline" title={t('feed.pickPost')} />}
         />
       )}
       <PostComposer

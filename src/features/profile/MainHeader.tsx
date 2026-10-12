@@ -1,23 +1,21 @@
 /**
- * 메인 화면 상단: 제목 + 포인트 잔액 + 아바타(인증 배지). 포인트를 누르면 포인트 허브로 간다.
+ * 메인 탭 상단 바: 제목(또는 워드마크) + 포인트 알약 + 아바타(인증 배지). 포인트를 누르면 포인트 허브로 간다.
+ * 아래 줄(탭 등)은 children 으로.
  */
 
 import { router } from 'expo-router';
 import type { ReactNode } from 'react';
-import { Pressable, View } from 'react-native';
 
 import { useStorageUrl } from '@/firebase/storage';
 import { useT } from '@/i18n';
 import { useClaims } from '@/store/session';
 import { useBalance } from '@/store/wallet';
 import { useLayoutMode } from '@/ui/layout/useLayoutMode';
-import { Avatar, Icon, Row, Text } from '@/ui/primitives';
-import { radius, space, useColors } from '@/ui/theme';
+import { Avatar, HeaderBar, Pill, Press } from '@/ui/primitives';
 
 import { useMyProfile } from './useMyProfile';
 
-export function MainHeader({ title, right }: { title: string; right?: ReactNode }) {
-  const colors = useColors();
+export function MainHeader({ title, wordmark, right, children }: { title?: string; wordmark?: boolean; right?: ReactNode; children?: ReactNode }) {
   const { t } = useT();
   const me = useMyProfile();
   const avatar = useStorageUrl(me?.photos[0]);
@@ -26,48 +24,30 @@ export function MainHeader({ title, right }: { title: string; right?: ReactNode 
   const mode = useLayoutMode();
 
   return (
-    <Row
-      style={{
-        paddingHorizontal: space.lg,
-        paddingVertical: space.md,
-        borderBottomWidth: 1,
-        borderBottomColor: colors.border,
-        backgroundColor: colors.surface,
-        justifyContent: 'space-between',
-      }}
+    <HeaderBar
+      title={title}
+      wordmark={wordmark}
+      hairline={!children}
+      right={
+        <>
+          {right}
+          <Press
+            onPress={() => router.push({ pathname: '/feed', params: { tab: 'points' } })}
+            accessibilityRole="button"
+            accessibilityLabel={t('header.pointsA11y', { n: balance })}
+            haptic={false}
+          >
+            <Pill label={t('common.points', { n: balance })} tone="outline" icon="diamond-outline" />
+          </Press>
+          {mode === 'mobile' ? (
+            <Press onPress={() => router.push('/profile/me')} accessibilityRole="button" accessibilityLabel={t('nav.myProfile')} haptic={false}>
+              <Avatar uri={avatar} name={me?.nickname} size="sm" verified={claims.phoneVerified} />
+            </Press>
+          ) : null}
+        </>
+      }
     >
-      <Text variant="heading">{title}</Text>
-      <Row gap={space.md}>
-        {right}
-        <Pressable
-          onPress={() => router.push({ pathname: '/feed', params: { tab: 'points' } })}
-          accessibilityLabel={t('header.pointsA11y', { n: balance })}
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 4,
-            paddingHorizontal: space.md,
-            paddingVertical: 6,
-            borderRadius: radius.pill,
-            backgroundColor: colors.pointSoft,
-          }}
-        >
-          <Icon name="diamond" size={14} color={colors.point} />
-          <Text variant="label" color={colors.pointText}>
-            {t('common.points', { n: balance })}
-          </Text>
-        </Pressable>
-        {mode === 'mobile' ? (
-          <Pressable onPress={() => router.push('/profile/me')} accessibilityLabel={t('nav.myProfile')}>
-            <Avatar uri={avatar} name={me?.nickname} size={34} />
-            {claims.phoneVerified ? (
-              <View style={{ position: 'absolute', right: -2, bottom: -2 }}>
-                <Icon name="checkmark-circle" size={16} color={colors.verified} />
-              </View>
-            ) : null}
-          </Pressable>
-        ) : null}
-      </Row>
-    </Row>
+      {children}
+    </HeaderBar>
   );
 }
