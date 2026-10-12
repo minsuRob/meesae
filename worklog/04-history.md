@@ -63,6 +63,7 @@
 | 다크 지도가 너무 어두워 안 보임 | 실로그인 테스트 | 후보 3개(fiord · CARTO · 직접 조정) 비교 후 직접 조정안 채택 |
 | 배포한 웹에서 아이콘이 전부 ⊠ (Ionicons 폰트 요청이 index.html 로 떨어짐) | 실서버 웹(모바일) | Hosting `ignore` 의 `**/node_modules/**` 제거 — expo export 가 폰트를 `dist/assets/node_modules/` 에 둔다 |
 | Android: 키보드가 채팅 입력줄·글쓰기 시트·프로필 입력칸을 가림 (edge-to-edge 라 `adjustResize` 가 창을 안 줄임) | Android 에뮬레이터 | `src/ui/keyboard(.native).tsx` — 루트 `KeyboardProvider`, `Screen`·게시물 상세는 `KeyboardAwareScrollView`, 채팅·`Sheet` 는 `KeyboardAvoidingView`(padding, automaticOffset). 웹은 그대로 통과 |
+| Android 실기기: 계정을 골라도 Google 로그인이 '문제가 생겼어요' (DEVELOPER_ERROR) | Android 실기기 | Firebase Android 앱에 SHA 가 하나도 없어 `google-services.json` 에 Android OAuth 클라이언트가 없었다 → `firebase apps:android:sha:create` 로 서명 키 SHA 등록, `apps:sdkconfig` 로 다시 받아 재빌드 |
 | Android: Google '위치 정확도' 창에서 '사용 안함' 이면 위치 인증이 '문제가 생겼어요' | Android 에뮬레이터 | 창 없이 GPS(High)로 재시도 → 최근 위치(10분) → `errors.locationUnavailable` |
 | Android: 지도 지역 원을 눌러도 반응 없음 (`ViewAnnotation` 이 자식을 비트맵으로 그려 `Pressable` 무시) | Android 에뮬레이터 | `ViewAnnotation` 의 `onPress` 로 |
 | iOS: `pod install` 이 'SPM + static linkage is not supported' 로 실패 | iOS 첫 빌드 | `@react-native-firebase/app` 플러그인에 `ios.disableSPM: true` |

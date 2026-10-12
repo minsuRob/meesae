@@ -67,6 +67,8 @@ cd android && EXPO_PUBLIC_USE_EMULATOR=0 ./gradlew assembleRelease --no-daemon \
 # → android/app/build/outputs/apk/release/app-release.apk (디버그 키 서명)
 ```
 
+`SDK location not found` 면 `export ANDROID_HOME=$HOME/Library/Android/sdk` 후 다시. 실기기 한 대만 쓸 때는 `-PreactNativeArchitectures=arm64-v8a` 로 줄여도 된다.
+
 에뮬레이터 백엔드용 APK: `.env` 그대로(`=1`) 빌드하되, 릴리스는 http 를 막으므로 생성된
 `android/app/src/main/AndroidManifest.xml` 의 `<application>` 에 `android:usesCleartextTraffic="true"` 를 손으로 넣는다
 (prebuild `--clean` 하면 사라진다 — 실서버 APK 에는 넣지 않는다). 에뮬레이터는 `10.0.2.2` 로 맥의 Firebase 에뮬레이터에 붙는다.

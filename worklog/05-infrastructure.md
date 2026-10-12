@@ -42,7 +42,7 @@
 
 | 제공업체 | 상태 |
 |---|---|
-| Google | 켜짐 (공개 이름 `Meesae`) |
+| Google | 켜짐 (공개 이름 `Meesae`). Android 앱에 **디버그 키 SHA-1·SHA-256 등록** (지금 APK 서명 키) — 업로드 키 만들면 그 SHA 도 추가 |
 | 이메일/비밀번호 | **꺼짐** (스모크 테스트 때만 잠깐 켬) |
 | Apple · 휴대폰 | 꺼짐 — 콘솔 작업 필요 |
 | App Check | 미등록 → `functions/.env` 의 `ENFORCE_APP_CHECK=false` |

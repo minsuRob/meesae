@@ -3,7 +3,7 @@
 meesae 작업 기록. **전부 읽지 말고, 아래 표에서 지금 필요한 칸만 따라간다.**
 각 파일은 맨 위에 목차가 있고, 한 파일에 한 주제만 있다.
 
-마지막 갱신: 2026-10-12 · UI 일괄 개선 검증 (Airbnb 디자인 언어, 브랜치 ui/airbnb-light) · 원본 규칙은 루트 `AGENTS.md`
+마지막 갱신: 2026-10-12 · Android 실기기 Google 로그인 (디버그 키 SHA 등록) · UI 일괄 개선 검증 (브랜치 ui/airbnb-light) · 원본 규칙은 루트 `AGENTS.md`
 
 ## 이럴 땐 여기
 
@@ -58,9 +58,9 @@ meesae 작업 기록. **전부 읽지 말고, 아래 표에서 지금 필요한 
 - 서버: `meesae-app`(Blaze) — Firestore·Storage(서울), Rules·인덱스, Functions 29개, 웹 https://meesae-app.web.app. `beforeSignIn` 보류
 - 로그인: Google 만 켜짐. Apple·휴대폰 미설정
 - 테스트: 단위 41 · Rules 22 · Functions 통합 16 · 실서버 스모크 18 전부 통과, 본인 구글 계정으로 실서버 웹 흐름 확인
-- Android: 릴리스 APK 빌드, 에뮬레이터에서 전 흐름 확인 ([06 › Android 네이티브](06-testing.md#android-네이티브)). 실서버 Google 로그인은 SHA-1 등록 전이라 안 됨
+- Android: 릴리스 APK 빌드, 에뮬레이터에서 전 흐름 확인 ([06 › Android 네이티브](06-testing.md#android-네이티브)). 실기기(실서버)에서 Google 로그인 확인 — 지금은 디버그 키 SHA 로
 - iOS: 시뮬레이터 Release 빌드, 전 흐름 확인 ([06 › iOS 네이티브](06-testing.md#ios-네이티브)). 실기기 서명 팀 미정
-- 아직: Android SHA-1 미등록, **App Check 강제 꺼짐** → [07 › P0](07-todo.md#p0-출시-차단)
+- 아직: Android 업로드 키(SHA) 미생성, **App Check 강제 꺼짐** → [07 › P0](07-todo.md#p0-출시-차단)
 
 ## 이 폴더 고치는 법
 

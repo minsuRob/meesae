@@ -18,7 +18,7 @@
 | 3 | **Apple 로그인** 설정 (또는 그때까지 버튼 숨김) | Apple Developer + 콘솔 | 지금 누르면 '준비 중' 안내 |
 | 4 | **휴대폰 인증** 켜기 · SMS 지역 정책 · 테스트 번호 · Android SHA 지문 | 콘솔 | 문자 건당 과금 |
 | 5 | **iOS 실기기** 검증 (실로그인·App Attest·키보드) — 시뮬레이터 전 흐름은 끝남. .ipa 는 앱 전용 Apple 팀(개인 또는 새 조직) 정한 뒤 | 로컬 | [06 › iOS 네이티브](06-testing.md#ios-네이티브) |
-| 5a | **Android 업로드 키스토어** 만들고 그 SHA-1(+ Play 앱 서명 SHA-1)을 Firebase Android 앱에 등록 → `google-services.json` 다시 받기 | 로컬 + 콘솔 | 지금 APK 는 RN 템플릿 디버그 키(공개된 키)로 서명. SHA 없으면 안드로이드 Google 로그인·휴대폰 인증 실패 |
+| 5a | **Android 업로드 키스토어** 만들고 그 SHA-1(+ Play 앱 서명 SHA-1)을 Firebase Android 앱에 등록 → `google-services.json` 다시 받기 | 로컬 + 콘솔 | 지금 APK 는 RN 템플릿 디버그 키(공개된 키)로 서명. 디버그 키 SHA 는 등록해 둠(테스트용) — 출시 전 업로드 키 SHA 추가 후 디버그 키 SHA 는 지운다 |
 | 6 | **법적 요건**: 위치기반서비스사업 신고 검토, 이용약관·개인정보처리방침 페이지 | 사용자 | 현재 문구만 있고 페이지 없음 |
 | 7 | 역지오코딩을 Google Geocoding 으로 (`GEOCODER=google` + 비밀값) | CLI | Nominatim 은 운영용 아님 |
 | 8 | **API 키 사용 제한** (허용 앱·도메인) | GCP 콘솔 | 저장소가 공개 |
