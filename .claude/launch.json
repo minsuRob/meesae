@@ -39,6 +39,18 @@
         "8099"
       ],
       "port": 8099
+    },
+    {
+      "name": "web-ui2",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "expo",
+        "start",
+        "--web",
+        "--port",
+        "8101"
+      ],
+      "port": 8101
     }
   ]
 }
