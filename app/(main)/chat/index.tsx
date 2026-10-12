@@ -23,7 +23,7 @@ import { useFilters } from '@/store/filters';
 import { useUid } from '@/store/session';
 import { SplitPane } from '@/ui/layout/SplitPane';
 import { useLayoutMode } from '@/ui/layout/useLayoutMode';
-import { Button, Empty, Icon, IconButton, Press, Row, SkeletonList, Stack, Tabs, Text } from '@/ui/primitives';
+import { Button, Empty, Icon, Press, Row, SkeletonList, Stack, Tabs, Text } from '@/ui/primitives';
 import { control, radius, space, useColors, useElevation } from '@/ui/theme';
 
 type Tab = 'discover' | 'chats';
@@ -70,7 +70,18 @@ function FilterPill({ summary, onPress }: { summary: string; onPress: () => void
             {summary}
           </Text>
         </Stack>
-        <IconButton name="options-outline" label={t('discover.filter')} variant="tonal" size="md" onPress={onPress} />
+        <View
+          style={{
+            width: control.iconButton,
+            height: control.iconButton,
+            borderRadius: radius.pill,
+            backgroundColor: colors.surface3,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Icon name="options-outline" size="lg" />
+        </View>
       </Press>
     </View>
   );

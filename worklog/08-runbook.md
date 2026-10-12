@@ -16,6 +16,7 @@
 - [웹 지도가 빈 화면](#웹-지도가-빈-화면)
 - [웹 아이콘이 ⊠ 로 깨짐](#웹-아이콘이--로-깨짐)
 - [브라우저 자동화 제약](#브라우저-자동화-제약)
+- [UI 갤러리와 시안](#ui-갤러리와-시안)
 
 ## 로컬 실행
 
@@ -166,3 +167,10 @@ gcloud run services add-iam-policy-binding <함수이름소문자> --region asia
 Claude 브라우저 패널에서는 에이전트 클릭으로 연 팝업(구글 로그인·결제 창)과 위치 권한이 막힌다.
 로그인·결제·위치 허용은 사람이 하고, 이후 단계부터 이어서 자동화한다. 확인 창(`window.confirm`)은
 테스트 탭에서만 기록용으로 바꿔 끼워 진행했다.
+
+## UI 갤러리와 시안
+
+- 디자인 시안(HTML 한 장, 빌드 없음): `docs/ui-prototypes/*.html`. 브라우저로 보려면 `public/qa-ui/`(gitignore)에 복사하고 `npm run web` 뒤 `http://localhost:8097/qa-ui/<파일>` 로 연다. `?variant=` `?screen=` `?focus=1`(캡처용 스크롤) 쿼리
+- 앱 안 갤러리: 개발 모드 웹에서 `/dev/ui`. 라이트·다크 두 열에 모든 primitive 와 팔레트가 나란히 뜬다
+- 토큰을 바꾸면 `npx vitest run src/ui` 로 대비를 먼저 확인한다
+- dev 로그인 계정을 온보딩 없이 메인으로 보내려면 (에뮬레이터 전용): 로그인 한 번 한 뒤 `FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9099 FIRESTORE_EMULATOR_HOST=127.0.0.1:8080` 으로 firebase-admin 스크립트를 돌려 `auth.listUsers()` 에서 uid 를 찾고 `users_public/{uid}`·`users_private/{uid}` 를 seed 형식으로 쓰고 `setCustomUserClaims(uid, { onboarded: true })`. 그 뒤 브라우저에서 `firebaseLocalStorageDb` IndexedDB 를 지우고 다시 로그인해야 새 클레임이 토큰에 실린다

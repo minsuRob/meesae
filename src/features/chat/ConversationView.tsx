@@ -23,7 +23,7 @@ import { useWallet } from '@/store/wallet';
 import { KeyboardAvoid } from '@/ui/keyboard';
 import { confirm, notify } from '@/ui/notify';
 import { Avatar, Chip, Empty, HeaderBar, IconButton, ListGroup, ListRow, Loading, Photo, Pill, Press, Row, Sheet, Stack, Text } from '@/ui/primitives';
-import { control, fontFamily, layout, radius, space, type, useColors, useScheme } from '@/ui/theme';
+import { control, fontFamily, layout, noOutline, radius, space, type, useColors, useScheme } from '@/ui/theme';
 import { useNow } from '@/ui/useNow';
 
 import { currentCoords } from '../location/current';
@@ -315,7 +315,7 @@ export function ConversationView({ id, embedded }: { id: string; embedded?: bool
               maxLength={LIMITS.MESSAGE_MAX}
               multiline
               onSubmitEditing={send}
-              style={{ fontFamily, fontSize: type.body.fontSize, color: colors.text, paddingVertical: space.sm, maxHeight: layout.chatInputMaxHeight - space.sm }}
+              style={[{ fontFamily, fontSize: type.body.fontSize, color: colors.text, paddingVertical: space.sm, maxHeight: layout.chatInputMaxHeight - space.sm }, noOutline]}
             />
           </View>
           <IconButton name="arrow-up" label={t('chat.send')} variant="filled" onPress={send} disabled={!canSend} />

@@ -7,7 +7,7 @@
  */
 
 import { createContext, useContext } from 'react';
-import { Platform, useColorScheme } from 'react-native';
+import { Platform, useColorScheme, type TextStyle } from 'react-native';
 
 import { useThemePref } from '@/store/theme';
 
@@ -44,3 +44,6 @@ export const fontFamily = Platform.select({
   web: '"Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, sans-serif',
   default: 'Pretendard',
 }) as string;
+
+/** 웹 브라우저의 기본 포커스 테두리 끄기 (입력창은 바깥 상자가 포커스를 보여 준다) */
+export const noOutline = Platform.select({ web: { outlineStyle: 'none' } as unknown as TextStyle, default: undefined });

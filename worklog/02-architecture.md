@@ -49,6 +49,8 @@ CLAUDE.md            Claude 길잡이 (루트 + functions · shared · src/i18n 
 | 오류를 사용자 문구로 | `toApiError(e).message` (코드 → 번역) |
 | Firestore 실시간 구독 | `src/firebase/hooks.ts` 의 `useDoc` · `useQuery` · `useAsync` |
 | 번역 | `const { t } = useT()` / 컴포넌트 밖 `translate()` |
+| 디자인 토큰(순수 TS) | `src/ui/tokens.ts` (팔레트 두 벌·타입 스케일·radius·elevation·motion) |
+| 기본 컴포넌트 | `src/ui/primitives/*.tsx` (배럴 `index.tsx`), 개발용 갤러리 `app/dev/ui.tsx` |
 | 색·간격 | `src/ui/theme.ts` (`useColors`, `space`, `radius`) |
 | 알림·확인 창 | `src/ui/notify.ts` (웹은 window.alert/confirm) |
 | 지도 스타일 | `src/features/map/useMapStyle.ts` · `meesaeDark.ts` |

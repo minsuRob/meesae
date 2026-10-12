@@ -72,7 +72,7 @@ export function PostCard({ post, onOpen }: { post: Post; onOpen: (id: string) =>
   const avatar = useStorageUrl(post.author.photo);
   const meta = usePostMeta(post);
   return (
-    <Card onPress={() => onOpen(post.id)}>
+    <Card>
       <Stack gap={space.md}>
         <Press
           haptic={false}
@@ -86,9 +86,11 @@ export function PostCard({ post, onOpen }: { post: Post; onOpen: (id: string) =>
             <Text variant="caption">{meta}</Text>
           </Stack>
         </Press>
-        <Text tone="body" numberOfLines={8}>
-          {post.text}
-        </Text>
+        <Press onPress={() => onOpen(post.id)} haptic={false} pressScale={1} accessibilityRole="button">
+          <Text tone="body" numberOfLines={8}>
+            {post.text}
+          </Text>
+        </Press>
         {post.imagePaths.length ? (
           <Row gap={space.sm}>
             {post.imagePaths.slice(0, 2).map((p) => (
@@ -100,12 +102,12 @@ export function PostCard({ post, onOpen }: { post: Post; onOpen: (id: string) =>
         ) : null}
         <Row gap={space.xl}>
           <LikeButton post={post} />
-          <Row gap={space.xs}>
+          <Press onPress={() => onOpen(post.id)} haptic={false} pressScale={0.9} accessibilityRole="button" style={{ flexDirection: 'row', alignItems: 'center', gap: space.xs }}>
             <Icon name="chatbubble-outline" size="md" color={colors.text} />
             <Text variant="label" tone="muted">
               {post.commentCount}
             </Text>
-          </Row>
+          </Press>
         </Row>
       </Stack>
     </Card>

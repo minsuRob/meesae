@@ -58,29 +58,31 @@ export function ProfileCardView({
 
   return (
     <Stack gap={space.sm}>
-      <Press onPress={open} haptic={false} pressScale={0.99} accessibilityRole="button" accessibilityLabel={p.nickname}>
-        <View>
-          <Photo source={photo ? { uri: photo } : undefined} />
-          {verified ? (
-            <View style={{ position: 'absolute', top: space.md, left: space.md }}>
-              <Pill label={t('discover.verified')} tone="onPhoto" icon="checkmark-circle" />
-            </View>
-          ) : null}
-          <View style={{ position: 'absolute', top: space.sm, right: space.sm }}>
-            <HeartButton
-              liked={p.likedByMe}
-              label={p.likedByMe ? t('discover.liked') : t('discover.like')}
-              onPress={async () => {
-                if (liking) return;
-                setLiking(true);
-                const res = await likeUser(p.uid);
-                setLiking(false);
-                if (res) onLiked?.(p.uid);
-              }}
-            />
+      <View>
+        <Press onPress={open} haptic={false} pressScale={0.99} accessibilityRole="button" accessibilityLabel={p.nickname}>
+          <View>
+            <Photo source={photo ? { uri: photo } : undefined} />
+            {verified ? (
+              <View style={{ position: 'absolute', top: space.md, left: space.md }}>
+                <Pill label={t('discover.verified')} tone="onPhoto" icon="checkmark-circle" />
+              </View>
+            ) : null}
           </View>
+        </Press>
+        <View style={{ position: 'absolute', top: space.sm, right: space.sm }}>
+          <HeartButton
+            liked={p.likedByMe}
+            label={p.likedByMe ? t('discover.liked') : t('discover.like')}
+            onPress={async () => {
+              if (liking) return;
+              setLiking(true);
+              const res = await likeUser(p.uid);
+              setLiking(false);
+              if (res) onLiked?.(p.uid);
+            }}
+          />
         </View>
-      </Press>
+      </View>
       <Press onPress={open} haptic={false} pressScale={1}>
         <Stack gap={space.xxs}>
           <Row gap={space.xs}>

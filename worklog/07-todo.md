@@ -3,6 +3,7 @@
 - [P0 출시 차단](#p0-출시-차단)
 - [P1 핵심 기능 공백](#p1-핵심-기능-공백)
 - [P2 운영과 품질](#p2-운영과-품질)
+- [UI 일괄 개선 후속](#ui-일괄-개선-후속)
 - [작은 개선 후보](#작은-개선-후보)
 - [미정 정책](#미정-정책)
 
@@ -38,6 +39,13 @@
 - CI (테스트·타입체크·린트·에뮬레이터 테스트) + 웹 E2E
 - 앱 아이콘·스플래시 (Expo 기본값 그대로)
 - 추천 비용 점검 (요청당 후보 60명 읽기)
+
+## UI 일괄 개선 후속
+
+- 네이티브 확인: `npx expo run:ios` / `run:android` 로 Pretendard 임베드·다크 스플래시·Sheet(키보드)·탭바 인셋·햅틱
+- 접속 중 점: `ProfileCard`(shared/api.ts)에 `lastActiveAt` 을 더하고 `functions/src/api/discover.ts` `toCard()` 에서 넘기면 `Pill tone="online"`·`Avatar online` 이 바로 쓴다
+- 다크 지도 스타일(`meesaeDark.ts`)의 배경을 새 다크 `bg`(#121212)에 맞출지 결정
+- 앱 아이콘은 아직 Expo 기본. 스플래시 배경은 흰색/오프블랙으로 바꿨다
 
 ## 작은 개선 후보
 

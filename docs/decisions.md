@@ -15,6 +15,8 @@
 | 번역 | ko 기준 카탈로그 + 타입으로 키 강제, 서버는 코드만 | 언어 추가가 파일 하나 |
 | 지역 이름 | regionKey 는 현지 이름, 라벨은 언어별로 따로 저장 | 언어를 바꿔도 같은 동네가 같은 키 |
 | 다크모드 | 라이트/다크 팔레트 + `useColors()`, 설정에서 시스템/라이트/다크 | |
+| 디자인 언어 | Airbnb (awesome-design-md/airbnb): 흰 캔버스 + 잉크 #222, 액센트는 Rausch 1색, 카드 14 / 버튼·입력 8 / 알약, 그림자 1단계. 다크는 같은 키에 오프블랙 값 | 시안 4안(Pinterest·Airbnb·Apple·Notion) 중 사용자가 선택. `docs/ui-prototypes/light-directions.html` |
+| 글꼴 | Pretendard (static OTF 400/600/700, 웹은 CDN CSS) | 한국어 앱 표준 느낌, SIL OFL |
 
 ## 아직 정하지 않은 것
 

@@ -1,7 +1,7 @@
 import { forwardRef, useState, type ReactNode } from 'react';
 import { TextInput, View, type TextInputProps } from 'react-native';
 
-import { control, fontFamily, radius, space, type, useColors, useScheme } from '../theme';
+import { control, fontFamily, noOutline, radius, space, type, useColors, useScheme } from '../theme';
 
 import { Stack } from './Layout';
 import { Text } from './Text';
@@ -72,6 +72,7 @@ export const Input = forwardRef<TextInput, InputProps>(function Input(
               color: colors.text,
               minHeight: control.input - 2,
             },
+            noOutline,
             style,
           ]}
         />

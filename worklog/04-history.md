@@ -4,6 +4,7 @@
 - [실프로젝트 배포와 테스트](#실프로젝트-배포와-테스트)
 - [테스트 중 고친 버그](#테스트-중-고친-버그)
 - [사용자와 정한 것](#사용자와-정한-것)
+- [UI 일괄 개선](#ui-일괄-개선)
 
 계획서(`~/.claude/plans/indexed-honking-candy.md`)를 바탕으로 빈 저장소에서 시작했다.
 
@@ -77,3 +78,23 @@
 - 실서버 자동 테스트용 이메일 로그인은 테스트 동안만 켜고 끈다 (지금 꺼짐)
 - 다크 지도 = C안(meesae 다크)
 - iOS 는 시뮬레이터 빌드까지만. 실기기 서명은 맥의 회사 팀 인증서를 쓰지 않는다 (2026-10-12)
+
+## UI 일괄 개선
+
+2026-10-12, 브랜치 `ui/airbnb-light`. 계획서 `~/.claude/plans/tender-watching-noodle.md`.
+
+| 커밋 | 내용 |
+|---|---|
+| b817afc | 토큰(`tokens.ts`)·primitives 분할·전 화면 재배치·Pretendard·다크 스플래시·시안 HTML |
+| (다음 커밋) | 다크 팔레트 정리, `/dev/ui` 갤러리, 웹 `<button>` 중첩 제거, 입력 포커스 테두리, 작업 기록 |
+
+절차: App Store 스크린샷(글램·위피·튤립·윌유)과 다크모드 블로그 분석 → Taste Skill·Vercel Web Interface Guidelines·awesome-design-md 규칙을 읽고
+브랜드 4안을 HTML 한 장(`docs/ui-prototypes/light-directions.html`)으로 비교 → Airbnb 안 선택 → `DESIGN.md` 값을 토큰에 옮김.
+다크 팔레트 시안은 `dark-variants.html` (A/B/C 는 쓰지 않았고 대비 수식만 테스트로 남김).
+
+### 사용자와 정한 것 (UI)
+
+- 추천 화면은 2열 그리드 + 사진 카드 유지 (글램식 1열 풀블리드 아님)
+- 디자인 방향은 Airbnb 안. 다크모드도 같은 언어로 (오프블랙 캔버스, 말풍선은 라이트의 잉크를 뒤집은 밝은 말풍선)
+- 글꼴은 Pretendard
+- 검증은 다른 세션에서 한다 (이 세션은 웹 라이트·다크 캡처까지)
