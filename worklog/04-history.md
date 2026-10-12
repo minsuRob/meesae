@@ -87,6 +87,8 @@
 |---|---|
 | b817afc | 토큰(`tokens.ts`)·primitives 분할·전 화면 재배치·Pretendard·다크 스플래시·시안 HTML |
 | 4283ead | 다크 팔레트 정리, `/dev/ui` 갤러리, 웹 `<button>` 중첩 제거, 입력 포커스 테두리, 작업 기록 |
+| 6796eb9 | (검증 세션) 대화방 헤더 '알 수 없음' 깜빡임 제거, 검증 결과 기록 |
+| 75618bb | 접속 중 표시(`shared/presence.ts` + `ProfileCard.lastActiveAt`), 숫자 탭룰러, 매치 햅틱, 추천 카드 등장 애니메이션, 위치 공유 `useNow` |
 | (다음 커밋) | 검증 세션: 대화방 헤더 '알 수 없음' 깜빡임 제거, 06-testing 에 웹·iOS·Android 확인 결과 |
 
 절차: App Store 스크린샷(글램·위피·튤립·윌유)과 다크모드 블로그 분석 → Taste Skill·Vercel Web Interface Guidelines·awesome-design-md 규칙을 읽고
